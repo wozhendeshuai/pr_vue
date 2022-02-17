@@ -1,15 +1,15 @@
 <template>
   <el-menu
-    :default-active="this.$store.state.menus.editableTabsValue"
-    class="el-menu-vertical-demo"
-    background-color="#545c64"
-    text-color="#fff"
-    active-text-color="#ffd04b"
+      :default-active="this.$store.state.menus.editableTabsValue"
+      class="el-menu-vertical-demo"
+      background-color="#545c64"
+      text-color="#fff"
+      active-text-color="#ffd04b"
   >
     <router-link to="/index">
       <el-menu-item
-        index="Index"
-        @click="selectMenu({ name: 'Index', title: '首页' })"
+          index="Index"
+          @click="selectMenu({ name: 'Index', title: '首页' })"
       >
         <template slot="title">
           <i class="el-icon-s-home"></i>
@@ -25,8 +25,8 @@
       </template>
       <router-link to="/project/repo">
         <el-menu-item
-          index="projectRepo"
-          @click="selectMenu({ name: 'projectRepo', title: '项目大盘' })"
+            index="projectRepo"
+            @click="selectMenu({ name: 'projectRepo', title: '项目大盘' })"
         >
           <template slot="title">
             <i class="el-icon-s-custom"></i>
