@@ -34,42 +34,61 @@
           </template>
         </el-menu-item>
       </router-link>
+      <router-link to="/project/team">
+        <el-menu-item index="projectTeam"
+                      @click="selectMenu({ name: 'projectTeam', title: '团队管理' })">
+          <template slot="title">
+            <i class="el-icon-rank"></i> <span slot="title">团队管理</span>
+          </template>
+        </el-menu-item>
+      </router-link>
 
-      <el-menu-item index="1-2">
-        <template slot="title">
-          <i class="el-icon-rank"></i> <span slot="title">团队管理</span>
-        </template>
-      </el-menu-item>
-      <el-menu-item index="1-3">
-        <template slot="title">
-          <i class="el-icon-menu"></i> <span slot="title">用户画像</span>
-        </template>
-      </el-menu-item>
+      <router-link to="/project/user">
+        <el-menu-item index="projectUser"
+                      @click="selectMenu({ name: 'projectUser', title: '用户画像' })">
+          <template slot="title">
+            <i class="el-icon-menu"></i> <span slot="title">用户画像</span>
+          </template>
+        </el-menu-item>
+      </router-link>
     </el-submenu>
     <el-submenu index="2">
       <template slot="title">
         <i class="el-icon-s-tools"></i> <span>Pull-Request</span>
       </template>
-      <el-menu-item index="2-1">
-        <template slot="title">
-          <i class="el-icon-s-order"></i> <span slot="title">PR排序列表</span>
-        </template>
-      </el-menu-item>
-      <el-menu-item index="2-2">
-        <template slot="title">
-          <i class="el-icon-s-order"></i> <span slot="title">排序模型管理</span>
-        </template>
-      </el-menu-item>
-      <el-menu-item index="2-3">
-        <template slot="title">
-          <i class="el-icon-s-order"></i> <span slot="title">查看PR详情</span>
-        </template>
-      </el-menu-item>
-      <el-menu-item index="2-4">
-        <template slot="title">
-          <i class="el-icon-s-order"></i> <span slot="title">评审PR</span>
-        </template>
-      </el-menu-item>
+
+      <router-link to="/pr/list">
+        <el-menu-item index="prList"
+                      @click="selectMenu({ name: 'prList', title: 'PR排序列表' })">
+          <template slot="title">
+            <i class="el-icon-s-order"></i> <span slot="title">PR排序列表</span>
+          </template>
+        </el-menu-item>
+      </router-link>
+      <router-link to="/pr/model">
+        <el-menu-item index="prModel"
+                      @click="selectMenu({ name: 'prModel', title: '排序模型管理' })">
+          <template slot="title">
+            <i class="el-icon-s-order"></i> <span slot="title">排序模型管理</span>
+          </template>
+        </el-menu-item>
+      </router-link>
+      <router-link to="/pr/detail">
+        <el-menu-item index="prDetail"
+                      @click="selectMenu({ name: 'prDetail', title: '查看PR详情' })">
+          <template slot="title">
+            <i class="el-icon-s-order"></i> <span slot="title">查看PR详情</span>
+          </template>
+        </el-menu-item>
+      </router-link>
+      <router-link to="/pr/review">
+        <el-menu-item index="prReview"
+                      @click="selectMenu({ name: 'prReview', title: '评审PR' })">
+          <template slot="title">
+            <i class="el-icon-s-order"></i> <span slot="title">评审PR</span>
+          </template>
+        </el-menu-item>
+      </router-link>
     </el-submenu>
   </el-menu>
 </template>
