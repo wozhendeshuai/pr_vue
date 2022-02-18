@@ -27,22 +27,34 @@
     </el-form>
     <div id="chart"></div>
     <el-row :gutter="20">
-        <el-button type="primary" @click="reTrainVisible = true">重新训练{{ choiceModel }}</el-button>
-        <el-button @click="timetaskVisible = true">设置{{ choiceModel }}定时任务</el-button>
+      <el-button type="primary" @click="reTrainVisible = true">重新训练{{ choiceModel }}</el-button>
+      <el-button @click="timetaskVisible = true">设置{{ choiceModel }}定时任务</el-button>
     </el-row>
     <el-dialog
-        title="提示"
+        title="重新训练"
         :visible.sync="reTrainVisible"
         width="30%"
         center>
-      <span>需要注意的是内容是默认不居中的</span>
+      <el-row align="center">
+        <el-form :model="reTrainForm" ref="loginForm" label-width="80px" >
+          <el-form-item label="项目名称" prop="repoName" style="width: 390px;">
+            {{ choiceRepoName }}
+          </el-form-item>
+          <el-form-item label="算法名称" prop="algName" style="width: 390px;">
+            {{ choiceModel }}
+          </el-form-item>
+          <el-form-item label="算法参数" prop="algParam" style="width: 390px;">
+            <el-input v-model="reTrainForm.algParam"></el-input>
+          </el-form-item>
+        </el-form>
+      </el-row>
       <span slot="footer" class="dialog-footer">
     <el-button type="danger" @click="reTrainVisible = false">取 消</el-button>
     <el-button type="primary" @click="reTrainVisible = false">确 定</el-button>
      </span>
     </el-dialog>
     <el-dialog
-        title="提示"
+        title="定时任务"
         :visible.sync="timetaskVisible"
         width="30%"
         center>
@@ -63,8 +75,13 @@ export default {
 
   name: "Role",
   data() {
-    return {
 
+    return {
+      reTrainForm: {
+        repoName: '',
+        algName: '',
+        algParam: ''
+      },
       repoList: [],
       choiceModel: "MART",
 
