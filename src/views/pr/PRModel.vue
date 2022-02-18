@@ -90,7 +90,8 @@ export default {
             yAxisIndex: 0,
             data: [],
             markLine: {
-              data: [{ type: 'average', name: 'Avg' }]
+              data: [{ type: 'average', name: 'Avg' }],
+              precision: 4
             }
           },
           {
@@ -100,7 +101,12 @@ export default {
             yAxisIndex: 0,
             data: [],
             markLine: {
-              data: [{ type: 'average', name: 'Avg' }]
+              data: [{silent:false,  type: 'average', name: 'mrr平均值' }],
+              label: {
+                show: true,
+                position: 'end'
+              },
+              precision: 4
             }
           },
           {
@@ -110,7 +116,8 @@ export default {
             yAxisIndex: 0,
             data: [],
             markLine: {
-              data: [{ type: 'average', name: 'Avg' }]
+              data: [{ type: 'average', name: 'Avg' }],
+              precision: 4
             }
           }
         ]
