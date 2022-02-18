@@ -7,7 +7,7 @@
     </el-aside>
     <el-container>
       <el-header>
-        <strong>VueAdmin后台管理系统</strong>
+        <strong>Pull-Request(PR)优先级排序工具</strong>
 
         <div class="header-avatar">
 
@@ -25,8 +25,6 @@
             </el-dropdown-menu>
           </el-dropdown>
 
-          <el-link href="https://markerhub.com" target="_blank">网站</el-link>
-          <el-link href="https://space.bilibili.com/13491144" target="_blank">B站</el-link>
         </div>
 
       </el-header>
@@ -73,14 +71,20 @@ export default {
       })
     },
     logout() {
-      this.$axios.post("/logout").then(res => {
-        localStorage.clear()
-        sessionStorage.clear()
+      localStorage.clear()
+      sessionStorage.clear()
 
-        this.$store.commit("resetState")
+      this.$store.commit("resetState")
 
-        this.$router.push("/login")
-      })
+      this.$router.push("/login")
+      // this.$axios.post("/logout").then(res => {
+      //   localStorage.clear()
+      //   sessionStorage.clear()
+      //
+      //   this.$store.commit("resetState")
+      //
+      //   this.$router.push("/login")
+      // })
     }
   }
 }

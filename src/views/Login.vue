@@ -1,11 +1,9 @@
 <template>
   <el-row type="flex" class="row-bg" justify="center">
     <el-col :xl="6" :lg="7">
-      <h2>欢迎来到VueAdmin管理系统</h2>
-      <el-image :src="require('@/assets/MarkerHub.jpg')" style="height: 180px; width: 180px;"></el-image>
+      <h2>欢迎来到Pull-Request(PR)优先级排序工具</h2>
+      <el-image :src="require('@/assets/devopsLogo.png')" style="height: 50px; width: 300px;"></el-image>
 
-      <p>公众号 MarkerHub</p>
-      <p>扫码二维码，回复【 VueAdmin 】获取登录密码</p>
 
     </el-col>
 
@@ -14,17 +12,18 @@
     </el-col>
     <el-col :xl="6" :lg="7">
       <el-form :model="loginForm" :rules="rules" ref="loginForm" label-width="80px">
-        <el-form-item label="用户名" prop="userName" style="width: 380px;">
+        <el-form-item label="用户名" prop="userName" style="width: 390px;">
           <el-input v-model="loginForm.userName"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="password" style="width: 380px;">
+        <el-form-item label="密码" prop="password" style="width: 390px;">
           <el-input v-model="loginForm.password" type="password"></el-input>
         </el-form-item>
 
-
         <el-form-item>
-          <el-button type="primary" @click="submitForm('loginForm')">立即创建</el-button>
-          <el-button @click="resetForm('loginForm')">重置</el-button>
+          <el-button type="primary" @click="submitForm('loginForm')">登录</el-button>
+          <el-button type="warning" @click="submitForm('loginForm')">注册</el-button>
+<!--          <el-button @click="resetForm('loginForm')">重置</el-button>-->
+
         </el-form-item>
       </el-form>
     </el-col>
