@@ -57,8 +57,8 @@
             <el-form-item label="PR创建者">
               <span>{{ props.row.prUserName }}</span>
             </el-form-item>
-            <el-form-item label="PR创建时间" >
-              <span >{{ props.row.createdAt | FormatDate }}</span>
+            <el-form-item label="PR创建时间">
+              <span>{{ props.row.createdAt | FormatDate }}</span>
             </el-form-item>
             <el-form-item label="PR更新时间">
               <span>{{ props.row.updatedAt | FormatDate }}</span>
@@ -128,8 +128,6 @@ export default {
       prList: [],
 
 
-      searchForm: {},
-      delBtlStatu: true,
       choiceRepoName: "",
       total: 0,
       size: 10,
@@ -138,30 +136,6 @@ export default {
       editForm: {},
 
       tableData: [],
-
-      editFormRules: {
-        username: [
-          {required: true, message: '请输入用户名称', trigger: 'blur'}
-        ],
-        email: [
-          {required: true, message: '请输入邮箱', trigger: 'blur'}
-        ],
-        statu: [
-          {required: true, message: '请选择状态', trigger: 'blur'}
-        ]
-      },
-
-      multipleSelection: [],
-
-      roleDialogFormVisible: false,
-      defaultProps: {
-        children: 'children',
-        label: 'name'
-      },
-      roleForm: {},
-      roleTreeData: [],
-      treeCheckedKeys: [],
-      checkStrictly: true
 
     }
   },
@@ -229,15 +203,18 @@ export default {
 .demo-table-expand {
   font-size: 0;
 }
+
 .demo-table-expand label {
   width: 90px;
   color: #99a9bf;
 }
+
 .demo-table-expand .el-form-item {
   margin-right: 0;
   margin-bottom: 0;
   width: 50%;
 }
+
 .el-pagination {
   float: right;
   margin-top: 22px;
