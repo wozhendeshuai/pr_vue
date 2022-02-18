@@ -26,6 +26,32 @@
       </el-radio-group>
     </el-form>
     <div id="chart"></div>
+    <el-row :gutter="20">
+        <el-button type="primary" @click="reTrainVisible = true">重新训练{{ choiceModel }}</el-button>
+        <el-button @click="timetaskVisible = true">设置{{ choiceModel }}定时任务</el-button>
+    </el-row>
+    <el-dialog
+        title="提示"
+        :visible.sync="reTrainVisible"
+        width="30%"
+        center>
+      <span>需要注意的是内容是默认不居中的</span>
+      <span slot="footer" class="dialog-footer">
+    <el-button type="danger" @click="reTrainVisible = false">取 消</el-button>
+    <el-button type="primary" @click="reTrainVisible = false">确 定</el-button>
+     </span>
+    </el-dialog>
+    <el-dialog
+        title="提示"
+        :visible.sync="timetaskVisible"
+        width="30%"
+        center>
+      <span>需要注意的是内容是默认不居中的</span>
+      <span slot="footer" class="dialog-footer">
+    <el-button type="danger" @click="timetaskVisible = false">取 消</el-button>
+    <el-button type="primary" @click="timetaskVisible = false">确 定</el-button>
+     </span>
+    </el-dialog>
   </div>
 
 </template>
@@ -38,6 +64,7 @@ export default {
   name: "Role",
   data() {
     return {
+
       repoList: [],
       choiceModel: "MART",
 
@@ -46,7 +73,8 @@ export default {
       total: 0,
       size: 10,
       current: 1,
-      dialogVisible: false,
+      reTrainVisible: false,
+      timetaskVisible: false,
       editForm: {},
       tableData: [],
       myChart: null, // 定义变量用来存放echarts实例
@@ -90,7 +118,7 @@ export default {
             yAxisIndex: 0,
             data: [],
             markLine: {
-              data: [{ type: 'average', name: 'Avg' }],
+              data: [{type: 'average', name: 'Avg'}],
               precision: 4
             }
           },
@@ -101,7 +129,7 @@ export default {
             yAxisIndex: 0,
             data: [],
             markLine: {
-              data: [{silent:false,  type: 'average', name: 'mrr平均值' }],
+              data: [{silent: false, type: 'average', name: 'mrr平均值'}],
               label: {
                 show: true,
                 position: 'end'
@@ -116,7 +144,7 @@ export default {
             yAxisIndex: 0,
             data: [],
             markLine: {
-              data: [{ type: 'average', name: 'Avg' }],
+              data: [{type: 'average', name: 'Avg'}],
               precision: 4
             }
           }
@@ -149,9 +177,9 @@ export default {
         const tempNdcg = new Array();
         const tempMrr = new Array();
         const tempKendall = new Array();
-        const tempTestDay=new Array();
+        const tempTestDay = new Array();
         console.log(res.data.data);
-        for(let i=0; i<res.data.data.length; i++){
+        for (let i = 0; i < res.data.data.length; i++) {
           tempTestDay.push(res.data.data[i]['testDay']);
           tempNdcg.push(res.data.data[i]['ndcg']);
           tempMrr.push(res.data.data[i]['mrr']);
@@ -161,10 +189,10 @@ export default {
         console.log(tempNdcg);
         console.log(tempMrr);
         console.log(tempKendall);
-        this.option.xAxis['data']=tempTestDay
-        this.option.series[0]['data']=tempNdcg
-        this.option.series[1]['data']=tempMrr
-        this.option.series[2]['data']=tempKendall
+        this.option.xAxis['data'] = tempTestDay
+        this.option.series[0]['data'] = tempNdcg
+        this.option.series[1]['data'] = tempMrr
+        this.option.series[2]['data'] = tempKendall
         console.log(this.option.series[0]['data']);
         console.log(this.option.series[1]['data']);
         console.log(this.option.series[2]['data']);
@@ -191,7 +219,6 @@ export default {
         */
       });
     },
-
 
 
   },
