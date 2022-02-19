@@ -39,12 +39,17 @@
       </el-timeline>
     </el-form>
 
-
+<!--    <comment></comment>-->
   </div>
 </template>
 
 <script>
+// import comment from 'hbl-comment'
 export default {
+
+  // components:{
+  //   comment
+  // },
   name: "Role",
   data() {
     return {

@@ -6,7 +6,9 @@
 
 <script>
 	export default {
+
 		name: "App",
+
 		watch: {
 			$route(to, from) {
 
