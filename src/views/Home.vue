@@ -110,14 +110,14 @@ export default {
 }
 
 .el-header {
-  background-color: #17B3A3;
+  background-color: #7491ec;
   color: #333;
   text-align: center;
   line-height: 60px;
 }
 
 .el-aside {
-  background-color: #D3DCE6;
+  background-color: #8abbef;
   color: #333;
   line-height: 200px;
 }

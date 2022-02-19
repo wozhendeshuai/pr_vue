@@ -2,9 +2,6 @@
   <el-menu
       :default-active="this.$store.state.menus.editableTabsValue"
       class="el-menu-vertical-demo"
-      background-color="#545c64"
-      text-color="#fff"
-      active-text-color="#ffd04b"
   >
     <router-link to="/index">
       <el-menu-item
@@ -117,5 +114,13 @@ export default {
 <style scoped>
 .el-menu-vertical-demo {
   height: 100%;
+  text-underline: none;
+}
+a {
+  text-decoration: none;
+}
+
+.router-link-active {
+  text-decoration: none;
 }
 </style>

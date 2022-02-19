@@ -54,11 +54,11 @@
      </span>
     </el-dialog>
     <el-dialog
-        title="定时任务"
+        title="定时任务设置"
         :visible.sync="timetaskVisible"
         width="30%"
         center>
-      <span>需要注意的是内容是默认不居中的</span>
+      <span>这里将有定时任务相关信息</span>
       <span slot="footer" class="dialog-footer">
     <el-button type="danger" @click="timetaskVisible = false">取 消</el-button>
     <el-button type="primary" @click="timetaskVisible = false">确 定</el-button>
