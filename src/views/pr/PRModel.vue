@@ -50,7 +50,7 @@
       </el-row>
       <span slot="footer" class="dialog-footer">
     <el-button type="danger" @click="reTrainVisible = false">取 消</el-button>
-    <el-button type="primary" @click="reTrainVisible = false">确 定</el-button>
+    <el-button type="primary" @click="reTrainModel()">确 定</el-button>
      </span>
     </el-dialog>
     <el-dialog
@@ -195,6 +195,10 @@ export default {
 
   },
   methods: {
+    reTrainModel(){
+
+      this.reTrainVisible = false
+    },
     getModelEval() {
       console.log("仓库是" + this.choiceRepoName)
       console.log("排序算法是" + this.choiceModel)
