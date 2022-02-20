@@ -177,6 +177,15 @@ export default {
       console.log("res.data.data")
       console.log(res.data.data)
       this.repoList = res.data.data
+      var data=this.$route.query
+      console.log(data)
+      //从url解析数据后，获取最新的模型指标
+      if(data.repoName!=null){
+        console.log(data)
+        this.choiceRepoName=data.repoName
+        this.choiceModel=data.choiceModel
+        this.getModelEval()
+      }
     })
   },
   //调用

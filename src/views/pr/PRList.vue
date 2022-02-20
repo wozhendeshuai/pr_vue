@@ -14,8 +14,10 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getPRList()">确认</el-button>
+        <el-button @click="getModelDetail()" v-if="isChoiceModel==true">模型效果查看</el-button>
       </el-form-item>
     </el-form>
+<!--    <el-divider></el-divider>-->
 
     <el-form v-model="isChoiceModel" v-if="isChoiceModel==true">
       <el-radio-group v-model="choiceModel" size="small" @change="choiceModelDone">
@@ -124,10 +126,7 @@ export default {
       choiceEngine: "alg",
       choiceModel: "MART",
       choiceRule: "createtime",
-
       prList: [],
-
-
       choiceRepoName: "",
       total: 0,
       size: 10,
@@ -169,11 +168,21 @@ export default {
 
     },
     handleDetail(index, row) {
-      console.log(index, row.title);
+      console.log("选中的在table中的index是："+index);
+      console.log("选中的在table中的prnumber是："+row.prNumber);
+      this.$router.push({path:"/pr/detail",query:{repoName: this.choiceRepoName,prNumber: row.prNumber}})
     },
     handleMerge(index, row) {
-      console.log(index, row);
-      console.log(row.title)
+      console.log("选中的在table中的index是："+index);
+      console.log("选中的在table中的prnumber是："+row.prNumber);
+    },
+    getModelDetail(){
+      console.log("选中的排序规则是："+this.choiceModel);
+      console.log("仓库是" + this.choiceRepoName)
+      if(this.choiceRepoName.length==0){
+        alert("还未选择项目")
+      }
+      this.$router.push({path:"/pr/model",query:{choiceModel: this.choiceModel,repoName: this.choiceRepoName}})
     },
     choiceEngineDone: function (val) {
       console.log("选择了一个排序引擎")
