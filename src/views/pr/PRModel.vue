@@ -36,16 +36,20 @@
         width="30%"
         center>
       <el-row align="center">
-        <el-form :model="reTrainForm" ref="loginForm" label-width="80px" >
-          <el-form-item label="项目名称" prop="repoName" style="width: 390px;">
+        <el-form :model="reTrainForm" ref="loginForm" label-width="80px">
+          <el-form-item label="项目名称" prop="repoName" style="width: 390px;" v-model="reTrainForm.repoName">
             {{ choiceRepoName }}
           </el-form-item>
-          <el-form-item label="算法名称" prop="algName" style="width: 390px;">
+          <el-form-item label="算法名称" prop="algName" style="width: 390px;" v-model="reTrainForm.algName">
             {{ choiceModel }}
           </el-form-item>
           <el-form-item label="算法参数" prop="algParam" style="width: 390px;">
             <el-input v-model="reTrainForm.algParam"></el-input>
           </el-form-item>
+          <el-radio-group v-model="newFeatureFile" size="small">
+            <el-radio label="true">是</el-radio>
+            <el-radio label="false">否</el-radio>
+          </el-radio-group>
         </el-form>
       </el-row>
       <span slot="footer" class="dialog-footer">
@@ -80,11 +84,12 @@ export default {
       reTrainForm: {
         repoName: '',
         algName: '',
-        algParam: ''
+        algParam: '',
+        userName: '',
       },
       repoList: [],
       choiceModel: "MART",
-
+      userName: '',
       prList: [],
       choiceRepoName: "",
       total: 0,
@@ -167,7 +172,7 @@ export default {
           }
         ]
       },
-
+      newFeatureFile: 'false',
     }
   },
   created() {
@@ -177,13 +182,14 @@ export default {
       console.log("res.data.data")
       console.log(res.data.data)
       this.repoList = res.data.data
-      var data=this.$route.query
+      var data = this.$route.query
       console.log(data)
+      this.userName = localStorage.getItem("token")
       //从url解析数据后，获取最新的模型指标
-      if(data.repoName!=null){
+      if (data.repoName != null) {
         console.log(data)
-        this.choiceRepoName=data.repoName
-        this.choiceModel=data.choiceModel
+        this.choiceRepoName = data.repoName
+        this.choiceModel = data.choiceModel
         this.getModelEval()
       }
     })
@@ -195,8 +201,21 @@ export default {
 
   },
   methods: {
-    reTrainModel(){
-
+    reTrainModel() {
+      console.log("传过去的参数是：")
+      this.reTrainForm.algName = this.choiceModel
+      this.reTrainForm.repoName = this.choiceRepoName
+      this.reTrainForm.userName = this.userName
+      console.log(this.reTrainForm)
+      console.log(this.newFeatureFile)
+      this.$axios.get('/prSorting/alg/reTrainAlg?repoName=' + this.reTrainForm.repoName +
+          '&algName=' + this.reTrainForm.algName
+          + '&algPara=' + this.reTrainForm.algParam
+          + '&userName=' + this.reTrainForm.userName
+          + '&newFeature=' + this.newFeatureFile)
+          .then(res => {
+            alert("后台正在疯狂计算中，请稍等")
+          })
       this.reTrainVisible = false
     },
     getModelEval() {
