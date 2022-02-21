@@ -46,41 +46,41 @@
         style="width: 100%">
       <el-table-column type="expand">
         <template slot-scope="props">
-          <el-form label-position="left" inline class="demo-table-expand">
-            <el-form-item label="PR标题">
+          <el-form label-position="left" inline class="pr-table-expand">
+            <el-form-item label="PR标题:">
               <span>{{ props.row.title }}</span>
             </el-form-item>
-            <el-form-item label="PR内容">
+            <el-form-item label="PR内容:">
               <span>{{ props.row.body }}</span>
             </el-form-item>
-            <el-form-item label="PR编号">
+            <el-form-item label="PR编号:">
               <span>{{ props.row.prNumber }}</span>
             </el-form-item>
-            <el-form-item label="PR创建者">
+            <el-form-item label="PR创建者:">
               <span>{{ props.row.prUserName }}</span>
             </el-form-item>
-            <el-form-item label="PR创建时间">
+            <el-form-item label="PR创建时间:">
               <span>{{ props.row.createdAt | FormatDate }}</span>
             </el-form-item>
-            <el-form-item label="PR更新时间">
+            <el-form-item label="PR更新时间:">
               <span>{{ props.row.updatedAt | FormatDate }}</span>
             </el-form-item>
-            <el-form-item label="PR提交次数">
+            <el-form-item label="PR提交次数:">
               <span>{{ props.row.commitNumber }}</span>
             </el-form-item>
-            <el-form-item label="PR评论数量">
+            <el-form-item label="PR评论数量:">
               <span>{{ props.row.commentsNumber }}</span>
             </el-form-item>
-            <el-form-item label="PR评审数量">
+            <el-form-item label="PR评审数量:">
               <span>{{ props.row.reviewCommentsNumber }}</span>
             </el-form-item>
-            <el-form-item label="PR增加行数">
+            <el-form-item label="PR增加行数:">
               <span>{{ props.row.totalAddLine }}</span>
             </el-form-item>
-            <el-form-item label="PR删除行数">
+            <el-form-item label="PR删除行数:">
               <span>{{ props.row.totalDeleteLine }}</span>
             </el-form-item>
-            <el-form-item label="PR与当前分支是否有冲突">
+            <el-form-item label="PR与当前分支是否有冲突:">
               <span>{{ props.row.mergeableState }}</span>
             </el-form-item>
           </el-form>
@@ -108,6 +108,11 @@
               size="mini"
               type="danger"
               @click="handleMerge(scope.$index, scope.row)">合入PR
+          </el-button>
+          <el-button
+              size="mini"
+              type="warning"
+              @click="reviewPR(scope.$index, scope.row)">评审PR
           </el-button>
         </template>
       </el-table-column>
@@ -148,7 +153,11 @@ export default {
     })
   },
   methods: {
-
+    reviewPR(index, row) {
+      console.log("选中的在table中的index是："+index);
+      console.log("选中的在table中的prnumber是："+row.prNumber);
+      this.$router.push({path:"/pr/review",query:{repoName: this.choiceRepoName,prNumber: row.prNumber}})
+    },
     getPRList() {
       console.log("仓库是" + this.choiceRepoName)
       console.log("排序引擎是" + this.choiceEngine)
@@ -228,5 +237,7 @@ export default {
   float: right;
   margin-top: 22px;
 }
-
+label.el-form-item__label {
+  font-weight: bolder;
+}
 </style>

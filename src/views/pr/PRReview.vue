@@ -3,7 +3,7 @@
     <el-form :inline="true" :data="repoList">
       <el-form-item>
         <el-select v-model="choiceRepoName" filterable class="filter-item" placeholder="项目列表"
-                   @change="getPRNumberAndTitle(choiceRepoName)">
+                   @change="getPRNumberAndTitle()">
           <el-option v-for="repo in repoList" :value="repo.repoName">{{ repo.repoName }}</el-option>
         </el-select>
       </el-form-item>
@@ -27,52 +27,21 @@
           <el-option v-for="fileName in fileNameList" :value="fileName">{{ fileName }}</el-option>
         </el-select>
       </el-form-item>
-      <el-form-item>
-        <el-button @click="getPRFileDetail()">确认评审文件名称</el-button>
-      </el-form-item>
     </el-form>
     <el-divider></el-divider>
     <el-form>
       PR编号与标题：
       <el-card>
-        <div> {{ prDetail.prNumber }} {{ prDetail.title }}</div>
+        <div> {{ choicePRNumberAndTitle }}</div>
       </el-card>
       <el-divider></el-divider>
-      <div>内容
+      <div>修改的文件内容：
         <el-card>
-          <span></span>{{ prDetail.body }}
+          <span></span>
+          <el-col style="white-space: pre-wrap;">{{ fileDetail.patchContent }}</el-col>
         </el-card>
       </div>
       <el-divider></el-divider>
-      <div v-if="comments.length==0">
-        暂无评论
-      </div>
-      <div v-if="comments.length!=0">
-        <el-link v-bind:a="['https://github.com/tensorflow/tensorflow/pull/'+prDetail.prNumber]" target="_blank">
-          GitHub中第 {{ prDetail.prNumber }}号 PR 详情页面
-        </el-link>
-      </div>
-      <div class="radio" v-if="comments.length!=0">
-        排序：
-        <el-radio-group v-model="reverse">
-          <el-radio :label="true">倒序</el-radio>
-          <el-radio :label="false">正序</el-radio>
-        </el-radio-group>
-      </div>
-
-      <el-timeline :reverse="reverse">
-        <el-timeline-item
-            v-for="(commentsTemp, index) in comments"
-            :key="index"
-            :timestamp="commentsTemp.created_at"
-        >
-          <el-card>
-            <h4>{{ commentsTemp.user.login }}</h4>
-            <p>{{ commentsTemp.body }}</p>
-
-          </el-card>
-        </el-timeline-item>
-      </el-timeline>
     </el-form>
     <el-divider></el-divider>
     <!--   <comment></comment>-->
@@ -187,7 +156,7 @@ export default {
 
       prNumberList: [],
       prNumberAndTitleList: [],
-      prDetail: {},
+
 
       choiceRepoName: "",
       choicePRNumberAndTitle: "",
@@ -341,24 +310,8 @@ export default {
               break;
             }
           }
-          this.getPRDetail()
+          this.getPRFileList()
         }
-      })
-    },
-    getPRDetail() {
-      console.log("仓库是" + this.choiceRepoName)
-      console.log("choicePRNumberAndTitle是" + this.choicePRNumberAndTitle)
-      var prNumberArr = this.choicePRNumberAndTitle.split(":")
-      console.log(prNumberArr)
-      var prNumber = prNumberArr[0]
-
-      console.log("通过字符串分割得到的PRNumber: " + prNumber)
-      this.$axios.get('/prManage/prBase/getPRDetail?userName=' + this.userName + '&prNumber=' + prNumber + '&repoName=' + this.choiceRepoName).then(res => {
-        this.prDetail = res.data.data
-        console.log(this.prDetail)
-        // console.log("commentsContent: " + this.prDetail.commentsContent)
-        this.comments = JSON.parse(this.prDetail.commentsContent)
-        console.log("this.comments" + this.comments)
       })
     },
 

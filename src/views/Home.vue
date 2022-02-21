@@ -11,7 +11,7 @@
 
         <div class="header-avatar">
 
-          <el-avatar size="medium" :src="userInfo.avatar"></el-avatar>
+          <i class="el-icon-user-solid"></i>
 
           <el-dropdown>
 						<span class="el-dropdown-link">

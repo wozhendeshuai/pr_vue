@@ -1,186 +1,122 @@
 <template>
   <div>
-    <el-form :inline="true">
+    <el-form :inline="true" :data="repoList">
       <el-form-item>
-        <el-input
-            v-model="searchForm.username"
-            placeholder="用户名"
-            clearable
-        >
-        </el-input>
+        <el-select v-model="choiceRepoName" class="filter-item" placeholder="参与项目列表">
+          <el-option v-for="repo in repoList" :value="repo.repoName">{{ repo.repoName }}</el-option>
+        </el-select>
       </el-form-item>
+      <el-form-item>
+        <el-radio-group v-model="choiceEngine" size="small" @change="choiceEngineDone">
+          <el-radio label="alg">优先级排序算法引擎</el-radio>
+          <el-radio label="rule">规则排序引擎</el-radio>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="getPRList()">确认</el-button>
+        <el-button @click="getModelDetail()" v-if="isChoiceModel==true">模型效果查看</el-button>
+      </el-form-item>
+    </el-form>
+    <!--    <el-divider></el-divider>-->
 
-      <el-form-item>
-        <el-button @click="getUserList">搜索</el-button>
-      </el-form-item>
-
-      <el-form-item>
-        <el-button type="primary" @click="dialogVisible = true" v-if="hasAuth('sys:user:save')">新增</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-popconfirm title="这是确定批量删除吗？" @confirm="delHandle(null)">
-          <el-button type="danger" slot="reference" :disabled="delBtlStatu" v-if="hasAuth('sys:user:delete')">批量删除
-          </el-button>
-        </el-popconfirm>
-      </el-form-item>
+    <el-form v-model="isChoiceModel" v-if="isChoiceModel==true">
+      <el-radio-group v-model="choiceModel" size="small" @change="choiceModelDone">
+        <el-radio label="MART">MART</el-radio>
+        <el-radio label="RankNet">RankNet</el-radio>
+        <el-radio label="RankBoost">RankBoost</el-radio>
+        <el-radio label="AdaRank">AdaRank</el-radio>
+        <el-radio label="Coordinate_Ascent">Coordinate Ascent</el-radio>
+        <el-radio label="LambdaMART">LambdaMART</el-radio>
+        <el-radio label="ListNet">ListNet</el-radio>
+        <el-radio label="Random_Forests">Random Forests</el-radio>
+        <el-radio label="bayesnet">bayesnet</el-radio>
+        <el-radio label="xgboost">xgboost</el-radio>
+      </el-radio-group>
+    </el-form>
+    <el-form v-model="isChoiceRule" v-if="isChoiceRule==true">
+      <el-radio-group v-model="choiceRule" size="small" @change="choiceRuleDone">
+        <el-radio label="createtime">时间先后</el-radio>
+        <el-radio label="changefile">修改文件数量</el-radio>
+      </el-radio-group>
     </el-form>
 
     <el-table
-        ref="multipleTable"
-        :data="tableData"
-        tooltip-effect="dark"
-        style="width: 100%"
+        :data="prList"
         border
-        stripe
-        @selection-change="handleSelectionChange">
-
-      <el-table-column
-          type="selection"
-          width="55">
-      </el-table-column>
-
-      <el-table-column
-          label="头像"
-          width="50">
-        <template slot-scope="scope">
-          <el-avatar size="small" :src="scope.row.avatar"></el-avatar>
+        style="width: 100%">
+      <el-table-column type="expand">
+        <template slot-scope="props">
+          <el-form label-position="left" inline class="pr-table-expand">
+            <el-form-item label="PR标题:">
+              <span>{{ props.row.title }}</span>
+            </el-form-item>
+            <el-form-item label="PR内容:">
+              <span>{{ props.row.body }}</span>
+            </el-form-item>
+            <el-form-item label="PR编号:">
+              <span>{{ props.row.prNumber }}</span>
+            </el-form-item>
+            <el-form-item label="PR创建者:">
+              <span>{{ props.row.prUserName }}</span>
+            </el-form-item>
+            <el-form-item label="PR创建时间:">
+              <span>{{ props.row.createdAt | FormatDate }}</span>
+            </el-form-item>
+            <el-form-item label="PR更新时间:">
+              <span>{{ props.row.updatedAt | FormatDate }}</span>
+            </el-form-item>
+            <el-form-item label="PR提交次数:">
+              <span>{{ props.row.commitNumber }}</span>
+            </el-form-item>
+            <el-form-item label="PR评论数量:">
+              <span>{{ props.row.commentsNumber }}</span>
+            </el-form-item>
+            <el-form-item label="PR评审数量:">
+              <span>{{ props.row.reviewCommentsNumber }}</span>
+            </el-form-item>
+            <el-form-item label="PR增加行数:">
+              <span>{{ props.row.totalAddLine }}</span>
+            </el-form-item>
+            <el-form-item label="PR删除行数:">
+              <span>{{ props.row.totalDeleteLine }}</span>
+            </el-form-item>
+            <el-form-item label="PR与当前分支是否有冲突:">
+              <span>{{ props.row.mergeableState }}</span>
+            </el-form-item>
+          </el-form>
         </template>
       </el-table-column>
-
       <el-table-column
-          prop="username"
-          label="用户名"
-          width="120">
+          label="PR编号"
+          prop="prNumber">
       </el-table-column>
       <el-table-column
-          prop="code"
-          label="角色名称">
+          label="PR标题"
+          prop="title">
+      </el-table-column>
+      <el-table-column
+          label="PR内容"
+          prop="body" :show-overflow-tooltip="true">
+      </el-table-column>
+      <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-tag size="small" type="info" v-for="item in scope.row.sysRoles">{{ item.name }}</el-tag>
-        </template>
-
-      </el-table-column>
-      <el-table-column
-          prop="email"
-          label="邮箱">
-      </el-table-column>
-      <el-table-column
-          prop="phone"
-          label="手机号">
-      </el-table-column>
-
-      <el-table-column
-          prop="statu"
-          label="状态">
-        <template slot-scope="scope">
-          <el-tag size="small" v-if="scope.row.statu === 1" type="success">正常</el-tag>
-          <el-tag size="small" v-else-if="scope.row.statu === 0" type="danger">禁用</el-tag>
-        </template>
-
-      </el-table-column>
-      <el-table-column
-          prop="created"
-          width="200"
-          label="创建时间"
-      >
-      </el-table-column>
-      <el-table-column
-          prop="icon"
-          width="260px"
-          label="操作">
-
-        <template slot-scope="scope">
-          <el-button type="text" @click="roleHandle(scope.row.id)">分配角色</el-button>
-          <el-divider direction="vertical"></el-divider>
-
-          <el-button type="text" @click="repassHandle(scope.row.id, scope.row.username)">重置密码</el-button>
-          <el-divider direction="vertical"></el-divider>
-
-          <el-button type="text" @click="editHandle(scope.row.id)">编辑</el-button>
-          <el-divider direction="vertical"></el-divider>
-
-          <template>
-            <el-popconfirm title="这是一段内容确定删除吗？" @confirm="delHandle(scope.row.id)">
-              <el-button type="text" slot="reference">删除</el-button>
-            </el-popconfirm>
-          </template>
-
+          <el-button
+              size="mini"
+              @click="handleDetail(scope.$index, scope.row)">查看PR详情
+          </el-button>
+          <el-button
+              size="mini"
+              type="danger"
+              @click="handleMerge(scope.$index, scope.row)">合入PR
+          </el-button>
+          <el-button
+              size="mini"
+              type="warning"
+              @click="reviewPR(scope.$index, scope.row)">评审PR
+          </el-button>
         </template>
       </el-table-column>
-
     </el-table>
-
-    <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        layout="total, sizes, prev, pager, next, jumper"
-        :page-sizes="[10, 20, 50, 100]"
-        :current-page="current"
-        :page-size="size"
-        :total="total">
-    </el-pagination>
-
-
-    <!--新增对话框-->
-    <el-dialog
-        title="提示"
-        :visible.sync="dialogVisible"
-        width="600px"
-        :before-close="handleClose">
-
-      <el-form :model="editForm" :rules="editFormRules" ref="editForm">
-        <el-form-item label="用户名" prop="username" label-width="100px">
-          <el-input v-model="editForm.username" autocomplete="off"></el-input>
-          <el-alert
-              title="初始密码为888888"
-              :closable="false"
-              type="info"
-              style="line-height: 12px;"
-          ></el-alert>
-        </el-form-item>
-
-        <el-form-item label="邮箱" prop="email" label-width="100px">
-          <el-input v-model="editForm.email" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="手机号" prop="phone" label-width="100px">
-          <el-input v-model="editForm.phone" autocomplete="off"></el-input>
-        </el-form-item>
-
-        <el-form-item label="状态" prop="statu" label-width="100px">
-          <el-radio-group v-model="editForm.statu">
-            <el-radio :label="0">禁用</el-radio>
-            <el-radio :label="1">正常</el-radio>
-          </el-radio-group>
-        </el-form-item>
-
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="resetForm('editForm')">取 消</el-button>
-        <el-button type="primary" @click="submitForm('editForm')">确 定</el-button>
-      </div>
-    </el-dialog>
-
-    <!-- 分配权限对话框 -->
-    <el-dialog title="分配角色" :visible.sync="roleDialogFormVisible" width="600px">
-
-      <el-form :model="roleForm">
-        <el-tree
-            :data="roleTreeData"
-            show-checkbox
-            ref="roleTree"
-            :check-strictly=checkStrictly
-            node-key="id"
-            :default-expand-all=true
-            :props="defaultProps">
-        </el-tree>
-      </el-form>
-
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="roleDialogFormVisible=false">取 消</el-button>
-        <el-button type="primary" @click="submitRoleHandle('roleForm')">确 定</el-button>
-      </div>
-    </el-dialog>
-
   </div>
 </template>
 
@@ -189,219 +125,119 @@ export default {
   name: "Role",
   data() {
     return {
-      searchForm: {},
-      delBtlStatu: true,
-
+      repoList: [],
+      isChoiceModel: true,
+      isChoiceRule: false,
+      choiceEngine: "alg",
+      choiceModel: "MART",
+      choiceRule: "createtime",
+      prList: [],
+      choiceRepoName: "",
       total: 0,
       size: 10,
       current: 1,
-
       dialogVisible: false,
       editForm: {},
 
       tableData: [],
 
-      editFormRules: {
-        username: [
-          {required: true, message: '请输入用户名称', trigger: 'blur'}
-        ],
-        email: [
-          {required: true, message: '请输入邮箱', trigger: 'blur'}
-        ],
-        statu: [
-          {required: true, message: '请选择状态', trigger: 'blur'}
-        ]
-      },
-
-      multipleSelection: [],
-
-      roleDialogFormVisible: false,
-      defaultProps: {
-        children: 'children',
-        label: 'name'
-      },
-      roleForm: {},
-      roleTreeData: [],
-      treeCheckedKeys: [],
-      checkStrictly: true
-
     }
   },
   created() {
-    this.getUserList()
+    // this.getUserList()
 
-    this.$axios.get("/sys/role/list").then(res => {
-      this.roleTreeData = res.data.data.records
+    this.$axios.get("/project/repo/userProject?userName=" + localStorage.getItem("token")).then(res => {
+      console.log("res.data.data")
+      console.log(res.data.data)
+      this.repoList = res.data.data
     })
   },
   methods: {
-    toggleSelection(rows) {
-      if (rows) {
-        rows.forEach(row => {
-          this.$refs.multipleTable.toggleRowSelection(row);
-        });
-      } else {
-        this.$refs.multipleTable.clearSelection();
-      }
+    reviewPR(index, row) {
+      console.log("选中的在table中的index是："+index);
+      console.log("选中的在table中的prnumber是："+row.prNumber);
+      this.$router.push({path:"/pr/review",query:{repoName: this.choiceRepoName,prNumber: row.prNumber}})
     },
-    handleSelectionChange(val) {
-      console.log("勾选")
+    getPRList() {
+      console.log("仓库是" + this.choiceRepoName)
+      console.log("排序引擎是" + this.choiceEngine)
+      console.log("排序算法是" + this.choiceModel)
+      console.log("排序规则是" + this.choiceRule)
+      if (this.isChoiceModel) {
+        this.$axios.get('/prSorting/alg/listOrder?repoName=' + this.choiceRepoName + '&algName=' + this.choiceModel).then(res => {
+          this.prList = res.data.data
+          console.log(this.prList)
+        })
+      } else {
+        this.$axios.get('/prSorting/rule/sortOriginalData?repoName=' + this.choiceRepoName + '&sortRule=' + this.choiceRule).then(res => {
+          this.prList = res.data.data
+          console.log(this.prList)
+        })
+      }
+
+    },
+    handleDetail(index, row) {
+      console.log("选中的在table中的index是："+index);
+      console.log("选中的在table中的prnumber是："+row.prNumber);
+      this.$router.push({path:"/pr/detail",query:{repoName: this.choiceRepoName,prNumber: row.prNumber}})
+    },
+    handleMerge(index, row) {
+      console.log("选中的在table中的index是："+index);
+      console.log("选中的在table中的prnumber是："+row.prNumber);
+    },
+    getModelDetail(){
+      console.log("选中的排序规则是："+this.choiceModel);
+      console.log("仓库是" + this.choiceRepoName)
+      if(this.choiceRepoName.length==0){
+        alert("还未选择项目")
+      }
+      this.$router.push({path:"/pr/model",query:{choiceModel: this.choiceModel,repoName: this.choiceRepoName}})
+    },
+    choiceEngineDone: function (val) {
+      console.log("选择了一个排序引擎")
       console.log(val)
-      this.multipleSelection = val;
-
-      this.delBtlStatu = val.length == 0
-    },
-
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
-      this.size = val
-      this.getUserList()
-    },
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-      this.current = val
-      this.getUserList()
-    },
-
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
-      this.dialogVisible = false
-      this.editForm = {}
-    },
-    handleClose() {
-      this.resetForm('editForm')
-    },
-
-    getUserList() {
-      this.$axios.get("/sys/user/list", {
-        params: {
-          username: this.searchForm.username,
-          current: this.current,
-          size: this.size
-        }
-      }).then(res => {
-        this.tableData = res.data.data.records
-        this.size = res.data.data.size
-        this.current = res.data.data.current
-        this.total = res.data.data.total
-      })
-    },
-
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          this.$axios.post('/sys/user/' + (this.editForm.id ? 'update' : 'save'), this.editForm)
-              .then(res => {
-
-                this.$message({
-                  showClose: true,
-                  message: '恭喜你，操作成功',
-                  type: 'success',
-                  onClose: () => {
-                    this.getUserList()
-                  }
-                });
-
-                this.dialogVisible = false
-              })
-        } else {
-          console.log('error submit!!');
-          return false;
-        }
-      });
-    },
-    editHandle(id) {
-      this.$axios.get('/sys/user/info/' + id).then(res => {
-        this.editForm = res.data.data
-
-        this.dialogVisible = true
-      })
-    },
-    delHandle(id) {
-
-      var ids = []
-
-      if (id) {
-        ids.push(id)
+      if (val === "alg") {
+        this.isChoiceModel = true
+        this.isChoiceRule = false
       } else {
-        this.multipleSelection.forEach(row => {
-          ids.push(row.id)
-        })
+        this.isChoiceModel = false
+        this.isChoiceRule = true
       }
-
-      console.log(ids)
-
-      this.$axios.post("/sys/user/delete", ids).then(res => {
-        this.$message({
-          showClose: true,
-          message: '恭喜你，操作成功',
-          type: 'success',
-          onClose: () => {
-            this.getUserList()
-          }
-        });
-      })
+    }, choiceModelDone: function (val) {
+      console.log("选择了一个排序算法")
+      console.log(val)
+      this.choiceModel = val
     },
-
-    roleHandle(id) {
-      this.roleDialogFormVisible = true
-
-      this.$axios.get('/sys/user/info/' + id).then(res => {
-        this.roleForm = res.data.data
-
-        let roleIds = []
-        res.data.data.sysRoles.forEach(row => {
-          roleIds.push(row.id)
-        })
-
-        this.$refs.roleTree.setCheckedKeys(roleIds)
-      })
+    choiceRuleDone: function (val) {
+      console.log("选择了一个排序规则")
+      console.log(val)
+      this.choiceRule = val
     },
-    submitRoleHandle(formName) {
-      var roleIds = this.$refs.roleTree.getCheckedKeys()
-
-      console.log(roleIds)
-
-      this.$axios.post('/sys/user/role/' + this.roleForm.id, roleIds).then(res => {
-        this.$message({
-          showClose: true,
-          message: '恭喜你，操作成功',
-          type: 'success',
-          onClose: () => {
-            this.getUserList()
-          }
-        });
-
-        this.roleDialogFormVisible = false
-      })
-    },
-    repassHandle(id, username) {
-
-      this.$confirm('将重置用户【' + username + '】的密码, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.$axios.post("/sys/user/repass", id).then(res => {
-          this.$message({
-            showClose: true,
-            message: '恭喜你，操作成功',
-            type: 'success',
-            onClose: () => {
-            }
-          });
-        })
-      })
-    }
   }
 }
 </script>
 
 <style scoped>
+.demo-table-expand {
+  font-size: 0;
+}
+
+.demo-table-expand label {
+  width: 90px;
+  color: #99a9bf;
+}
+
+.demo-table-expand .el-form-item {
+  margin-right: 0;
+  margin-bottom: 0;
+  width: 50%;
+}
 
 .el-pagination {
   float: right;
   margin-top: 22px;
 }
-
+label.el-form-item__label {
+  font-weight: bolder;
+}
 </style>
