@@ -17,7 +17,18 @@
       </el-form-item>
 
       <el-form-item>
-        <el-button @click="getPRDetail()">确认</el-button>
+        <el-button @click="getPRFileList()">确认项目与PR编号</el-button>
+      </el-form-item>
+    </el-form>
+    <el-form :inline="true" :data="repoList">
+      <el-form-item>
+        <el-select v-model="choiceFileName" filterable class="filter-item" placeholder="项目列表"
+                   @change="getPRFileDetail()">
+          <el-option v-for="fileName in fileNameList" :value="fileName">{{ fileName }}</el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="getPRFileDetail()">确认评审文件名称</el-button>
       </el-form-item>
     </el-form>
     <el-divider></el-divider>
@@ -37,7 +48,7 @@
         暂无评论
       </div>
       <div v-if="comments.length!=0">
-        <el-link v-bind:href="['https://github.com/tensorflow/tensorflow/pull/'+prDetail.prNumber]" target="_blank">
+        <el-link v-bind:a="['https://github.com/tensorflow/tensorflow/pull/'+prDetail.prNumber]" target="_blank">
           GitHub中第 {{ prDetail.prNumber }}号 PR 详情页面
         </el-link>
       </div>
@@ -109,7 +120,6 @@
 <script>
 
 export default {
-
   name: "Role",
   props: {
     emojiWidth: {
@@ -160,6 +170,10 @@ export default {
   },
   data() {
     return {
+      fileNameList: [],
+      fileDetail: {},
+      choiceFileName: '',
+
       reverse: true,
       comments: [],
       userName: '',
@@ -283,7 +297,31 @@ export default {
     })
   },
   methods: {
+    getPRFileList(val) {
+      console.log("仓库是" + this.choiceRepoName)
+      console.log("choicePRNumberAndTitle是" + this.choicePRNumberAndTitle)
+      var prNumberArr = this.choicePRNumberAndTitle.split(":")
+      console.log(prNumberArr)
+      var prNumber = prNumberArr[0]
 
+      this.$axios.get('/prManage/prBase/getPRFileList?userName=' + this.userName + '&repoName=' + this.choiceRepoName + '&prNumber=' + prNumber).then(res => {
+        this.fileNameList = res.data.data
+        console.log("文件名列表")
+        console.log(this.fileNameList)
+      })
+    },
+    getPRFileDetail(val) {
+      console.log("仓库是" + this.choiceRepoName)
+      console.log("choicePRNumberAndTitle是" + this.choicePRNumberAndTitle)
+      var prNumberArr = this.choicePRNumberAndTitle.split(":")
+      console.log(prNumberArr)
+      var prNumber = prNumberArr[0]
+      this.$axios.get('/prManage/prBase/getPRFileDetail?userName=' + this.userName + '&repoName=' + this.choiceRepoName + '&prNumber=' + prNumber + '&fileName=' + this.choiceFileName).then(res => {
+        this.fileDetail = res.data.data
+        console.log("fileDetail")
+        console.log(this.fileDetail)
+      })
+    },
     getPRNumberAndTitle(val) {
       console.log("仓库是" + this.choiceRepoName)
       this.$axios.get('/prManage/prBase/getPRNumberAndTitle?userName=' + this.userName + '&repoName=' + this.choiceRepoName).then(res => {

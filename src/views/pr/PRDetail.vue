@@ -37,7 +37,7 @@
       <div v-if="comments.length==0">
         暂无评论
       </div>
-      <div v-if="prDetail.title.length!=0">
+      <div v-if="prDetail.prNumber!=null">
         <el-link v-bind:href="['https://github.com/tensorflow/tensorflow/pull/'+prDetail.prNumber]" target="_blank">
           GitHub中第 {{ prDetail.prNumber }}号 PR 详情页面
         </el-link>
