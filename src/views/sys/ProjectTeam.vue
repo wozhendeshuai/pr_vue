@@ -1,21 +1,79 @@
 <template>
   <div>
-    <el-row>
-      <el-col :span="8" v-for="(o, index) in 2" :key="o" :offset="index > 0 ? 2 : 0">
-        <el-card :body-style="{ padding: '0px' }">
-          <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" class="image">
-          <div style="padding: 14px;">
-            <span>好吃的汉堡</span>
-            <div class="bottom clearfix">
-              <time class="time">{{ currentDate }}</time>
-              <el-button type="text" class="button">操作按钮</el-button>
-            </div>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
+    <el-form :inline="true" :data="teamList">
+      <el-form-item>
+        <el-select v-model="choiceTeamName" class="filter-item" placeholder="参与的团队列表">
+          <el-option v-for="team in teamList" :value="team">{{ team }}</el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="getTeamAndUser()">确认</el-button>
+      </el-form-item>
+    </el-form>
 
+    <el-table
+        :data="userList"
+
+        border
+        v-if="userList.length!=0"
+        style="width: 100%">
+      <el-table-column
+          prop="userId"
+          label="用户ID"
+      >
+      </el-table-column>
+      <el-table-column
+          prop="userName"
+          label="用户名称"
+      >
+      </el-table-column>
+      <el-table-column
+          prop="userRoleInTeam"
+          label="用户角色">
+      </el-table-column>
+      <el-table-column
+          fixed="right"
+          label="操作"
+      >
+        <template slot-scope="scope">
+          <el-button @click="handleClick(scope.row)" type="primary" size="small">查看</el-button>
+          <el-button type="warning" size="small">修改成员权限</el-button>
+          <el-button type="danger" size="small">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-form>
+      <el-button @click="getNotInTeamNameList()" type="primary" size="small">为团队新增成员</el-button>
+    </el-form>
+    <el-dialog
+        title="新增团队成员"
+        :visible.sync="addNewMember"
+        width="30%"
+        center>
+      <el-row align="center">
+        <el-form :model="newUserName" ref="loginForm" label-width="80px">选择用户名：
+          <el-select v-model="newUserName" filterable class="filter-item" placeholder="">
+            <el-option v-for="notInUserName in noInTeamNameList" :value="notInUserName">{{
+                notInUserName
+              }}
+            </el-option>
+          </el-select>
+        </el-form>
+        <el-form>用户权限：
+          <el-checkbox-group v-model="userPowerList">
+            <el-checkbox label="repo">项目数据控制</el-checkbox>
+            <el-checkbox label="team">团队数据控制</el-checkbox>
+            <el-checkbox label="model">优先级模型管理</el-checkbox>
+          </el-checkbox-group>
+        </el-form>
+      </el-row>
+      <span slot="footer" class="dialog-footer">
+    <el-button type="danger" @click="addNewMember = false">取 消</el-button>
+    <el-button type="primary" @click="setNewMember()">确 定</el-button>
+     </span>
+    </el-dialog>
   </div>
+
 </template>
 
 <script>
@@ -23,219 +81,99 @@ export default {
   name: "Role",
   data() {
     return {
-      searchForm: {},
-      delBtlStatu: true,
+      addNewMember: false,
+      choiceTeamName: '',
+      teamList: [],
+      userName: '',
+      teamEntity: {},
+      userList: [],
+      newUserName: '',
+      noInTeamNameList: [],
+      userPowerList: ["repo",],
 
+      isChoiceModel: true,
+      isChoiceRule: false,
+      choiceEngine: "alg",
+      choiceModel: "MART",
+      choiceRule: "createtime",
+      prList: [],
+      choiceRepoName: "",
       total: 0,
       size: 10,
       current: 1,
-
       dialogVisible: false,
       editForm: {},
 
       tableData: [],
 
-      editFormRules: {
-        username: [
-          {required: true, message: '请输入用户名称', trigger: 'blur'}
-        ],
-        email: [
-          {required: true, message: '请输入邮箱', trigger: 'blur'}
-        ],
-        statu: [
-          {required: true, message: '请选择状态', trigger: 'blur'}
-        ]
-      },
-
-      multipleSelection: [],
-
-      roleDialogFormVisible: false,
-      defaultProps: {
-        children: 'children',
-        label: 'name'
-      },
-      roleForm: {},
-      roleTreeData: [],
-      treeCheckedKeys: [],
-      checkStrictly: true
-
     }
   },
   created() {
-    this.getUserList()
-
-    this.$axios.get("/sys/role/list").then(res => {
-      this.roleTreeData = res.data.data.records
+    this.$axios.get("/project/team/userTeamList?userName=" + localStorage.getItem("token")).then(res => {
+      console.log("res.data.data")
+      console.log(res.data.data)
+      this.teamList = res.data.data
+      this.userName = localStorage.getItem("token")
     })
   },
   methods: {
-    toggleSelection(rows) {
-      if (rows) {
-        rows.forEach(row => {
-          this.$refs.multipleTable.toggleRowSelection(row);
-        });
-      } else {
-        this.$refs.multipleTable.clearSelection();
-      }
+    setNewMember() {
+      this.addNewMember = false
+      console.log(this.userPowerList)
+      var userPower=this.userPowerList.toString()
+      console.log(this.userPower)
+      this.$axios.get('/project/team/addmember?teamName=' + this.choiceTeamName + '&userName=' + this.userName
+          + '&userRoleInTeam=MEMBER'
+          + '&newUserName=' + this.newUserName
+          + '&userPower=' + this.userPowerList.toString()).then(res => {
+        this.noInTeamNameList = res.data.data
+        console.log(this.noInTeamNameList)
+      })
     },
-    handleSelectionChange(val) {
-      console.log("勾选")
-      console.log(val)
-      this.multipleSelection = val;
-
-      this.delBtlStatu = val.length == 0
+    getNotInTeamNameList() {
+      this.addNewMember = true
+      this.$axios.get('/project/team/listNotTeamUser?teamName=' + this.choiceTeamName + '&userName=' + this.userName).then(res => {
+        this.noInTeamNameList = res.data.data
+        console.log(this.noInTeamNameList)
+      })
     },
-
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
-      this.size = val
-      this.getUserList()
-    },
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-      this.current = val
-      this.getUserList()
-    },
-
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
-      this.dialogVisible = false
-      this.editForm = {}
-    },
-    handleClose() {
-      this.resetForm('editForm')
-    },
-
-    getUserList() {
-      this.$axios.get("/sys/user/list", {
-        params: {
-          username: this.searchForm.username,
-          current: this.current,
-          size: this.size
-        }
-      }).then(res => {
-        this.tableData = res.data.data.records
-        this.size = res.data.data.size
-        this.current = res.data.data.current
-        this.total = res.data.data.total
+    getTeamAndUser() {
+      console.log("选择的团队名称是" + this.choiceTeamName)
+      this.$axios.get('/project/team/listTeamAndMemberUser?teamName=' + this.choiceTeamName + '&userName=' + this.userName).then(res => {
+        this.teamEntity = res.data.data
+        console.log(this.teamEntity)
+        this.userList = this.teamEntity.userBaseEntityList
+        console.log(this.userList)
       })
     },
 
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          this.$axios.post('/sys/user/' + (this.editForm.id ? 'update' : 'save'), this.editForm)
-              .then(res => {
 
-                this.$message({
-                  showClose: true,
-                  message: '恭喜你，操作成功',
-                  type: 'success',
-                  onClose: () => {
-                    this.getUserList()
-                  }
-                });
-
-                this.dialogVisible = false
-              })
-        } else {
-          console.log('error submit!!');
-          return false;
-        }
-      });
-    },
-    editHandle(id) {
-      this.$axios.get('/sys/user/info/' + id).then(res => {
-        this.editForm = res.data.data
-
-        this.dialogVisible = true
-      })
-    },
-    delHandle(id) {
-
-      var ids = []
-
-      if (id) {
-        ids.push(id)
-      } else {
-        this.multipleSelection.forEach(row => {
-          ids.push(row.id)
-        })
-      }
-
-      console.log(ids)
-
-      this.$axios.post("/sys/user/delete", ids).then(res => {
-        this.$message({
-          showClose: true,
-          message: '恭喜你，操作成功',
-          type: 'success',
-          onClose: () => {
-            this.getUserList()
-          }
-        });
-      })
-    },
-
-    roleHandle(id) {
-      this.roleDialogFormVisible = true
-
-      this.$axios.get('/sys/user/info/' + id).then(res => {
-        this.roleForm = res.data.data
-
-        let roleIds = []
-        res.data.data.sysRoles.forEach(row => {
-          roleIds.push(row.id)
-        })
-
-        this.$refs.roleTree.setCheckedKeys(roleIds)
-      })
-    },
-    submitRoleHandle(formName) {
-      var roleIds = this.$refs.roleTree.getCheckedKeys()
-
-      console.log(roleIds)
-
-      this.$axios.post('/sys/user/role/' + this.roleForm.id, roleIds).then(res => {
-        this.$message({
-          showClose: true,
-          message: '恭喜你，操作成功',
-          type: 'success',
-          onClose: () => {
-            this.getUserList()
-          }
-        });
-
-        this.roleDialogFormVisible = false
-      })
-    },
-    repassHandle(id, username) {
-
-      this.$confirm('将重置用户【' + username + '】的密码, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.$axios.post("/sys/user/repass", id).then(res => {
-          this.$message({
-            showClose: true,
-            message: '恭喜你，操作成功',
-            type: 'success',
-            onClose: () => {
-            }
-          });
-        })
-      })
-    }
   }
 }
 </script>
 
 <style scoped>
+.card-panel-col {
+  margin-bottom: 32px;
+}
 
 .el-pagination {
   float: right;
   margin-top: 22px;
 }
+
+.card-panel-icon-wrapper {
+  float: left;
+  margin: 14px 0 0 14px;
+  padding: 16px;
+  transition: all 0.38s ease-out;
+  border-radius: 6px;
+}
+
+.card-panel-icon {
+  float: left;
+  font-size: 48px;
+}
+
 
 </style>

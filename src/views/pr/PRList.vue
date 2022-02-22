@@ -237,7 +237,5 @@ export default {
   float: right;
   margin-top: 22px;
 }
-label.el-form-item__label {
-  font-weight: bolder;
-}
+
 </style>
