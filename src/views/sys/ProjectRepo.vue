@@ -4,10 +4,10 @@
       <el-col :span="8">
         <el-card shadow="hover" class="mgb20" style="height:403px;">
           <div class="user-info">
-            <img src="../../assets/devopsLogo.png" class="user-avator" alt />
+            <img src="../../assets/devopsLogo.png" class="user-avator" alt/>
             <div class="user-info-cont">
-              <div class="user-info-name">{{name}}</div>
-              <div>{{role}}</div>
+              <div class="user-info-name">{{ name }}</div>
+              <div>{{ role }}</div>
             </div>
           </div>
           <div class="user-info-list">
@@ -27,7 +27,7 @@
             <span>项目列表</span>
             <el-button style="float: right; padding: 5px 10px" type="primary">添加项目</el-button>
           </div>
-          <el-table border :data="todoList" style="width:100%;" height="390">
+          <el-table border :data="userRepoList" style="width:100%;" height="390">
             <el-table-column
                 prop="userName"
                 label="项目名称"
@@ -52,10 +52,14 @@
         <el-card shadow="hover" style="height:252px;">
           <div slot="header" class="clearfix">
             <span>语言详情</span>
-          </div>Vue
-          <el-progress :percentage="71.3" color="#42b983"></el-progress>JavaScript
-          <el-progress :percentage="24.1" color="#f1e05a"></el-progress>CSS
-          <el-progress :percentage="13.7"></el-progress>HTML
+          </div>
+          Vue
+          <el-progress :percentage="71.3" color="#42b983"></el-progress>
+          JavaScript
+          <el-progress :percentage="24.1" color="#f1e05a"></el-progress>
+          CSS
+          <el-progress :percentage="13.7"></el-progress>
+          HTML
           <el-progress :percentage="5.9" color="#f56c6c"></el-progress>
         </el-card>
       </el-col>
@@ -64,7 +68,7 @@
           <el-col :span="8">
             <el-card shadow="hover" :body-style="{padding: '0px'}">
               <div class="grid-content grid-con-1">
-                <i class="el-icon-lx-people grid-con-icon"></i>
+                <i class="el-icon-user grid-con-icon"></i>
                 <div class="grid-cont-right">
                   <div class="grid-num">1234</div>
                   <div>用户数量</div>
@@ -75,7 +79,7 @@
           <el-col :span="8">
             <el-card shadow="hover" :body-style="{padding: '0px'}">
               <div class="grid-content grid-con-2">
-                <i class="el-icon-lx-notice grid-con-icon"></i>
+                <i class="el-icon-upload grid-con-icon"></i>
                 <div class="grid-cont-right">
                   <div class="grid-num">321</div>
                   <div>提交次数</div>
@@ -86,7 +90,7 @@
           <el-col :span="8">
             <el-card shadow="hover" :body-style="{padding: '0px'}">
               <div class="grid-content grid-con-3">
-                <i class="el-icon-lx-goods grid-con-icon"></i>
+                <i class="el-icon-s-order grid-con-icon"></i>
                 <div class="grid-cont-right">
                   <div class="grid-num">5000</div>
                   <div>开放状态PR</div>
@@ -98,16 +102,17 @@
       </el-col>
     </el-row>
     <el-row :gutter="20">
-      <el-col :span="12">
-        <el-card shadow="hover">
-          <schart ref="bar" class="schart" canvasId="bar" :options="options"></schart>
-        </el-card>
-      </el-col>
-      <el-col :span="12">
-        <el-card shadow="hover">
-          <schart ref="line" class="schart" canvasId="line" :options="options2"></schart>
-        </el-card>
-      </el-col>
+      <el-card v-if="repoUserOptions.datasets.length!=0" shadow="hover">
+        <schart ref="line" class="schart" canvasId="bar" :options="repoUserOptions"></schart>
+      </el-card>
+      <el-card v-if="repoCommitOptions.datasets.length!=0" shadow="hover">
+        <schart ref="line" class="schart" canvasId="bar"
+                :options="repoCommitOptions"></schart>
+      </el-card>
+      <el-card v-if="repoOpenPROptions.datasets.length!=0" shadow="hover">
+        <schart ref="line" class="schart" canvasId="bar"
+                :options="repoOpenPROptions"></schart>
+      </el-card>
     </el-row>
   </div>
 </template>
@@ -119,25 +124,17 @@ export default {
   name: 'dashboard',
   data() {
     return {
-      name: localStorage.getItem('ms_username'),
-      todoList: [
-        {
-          title: '今天要修复100个bug',
-          status: false
-        },
+      userName: localStorage.getItem('token'),
+      //存储用户仓库对象
+      userRepoList: [],
+      repoBaseEntity: {},
+      repoDayEntity: {},
+      userLanguage: [],
 
-      ],
-      data: [
-        {
-          name: '2018/09/04',
-          value: 1083
-        },
-
-      ],
-      options: {
-        type: 'bar',
+      repoUserOptions: {
+        type: 'line',
         title: {
-          text: '最近一周各品类销售图'
+          text: '最近一月项目用户变化'
         },
         xRorate: 25,
         labels: ['周一', '周二', '周三', '周四', '周五'],
@@ -146,23 +143,36 @@ export default {
             label: '家电',
             data: [234, 278, 270, 190, 230]
           },
-
         ]
       },
-      options2: {
+      repoCommitOptions: {
         type: 'line',
         title: {
-          text: '最近几个月各品类销售趋势图'
+          text: '最近一月提交次数变化'
         },
-        labels: ['6月', '7月', '8月', '9月', '10月'],
+        xRorate: 25,
+        labels: ['周一', '周二', '周三', '周四', '周五'],
         datasets: [
           {
             label: '家电',
             data: [234, 278, 270, 190, 230]
           },
-
         ]
-      }
+      },
+      repoOpenPROptions: {
+        type: 'line',
+        title: {
+          text: '最近一月开放PR变化'
+        },
+        xRorate: 25,
+        labels: ['周一', '周二', '周三', '周四', '周五'],
+        datasets: [
+          {
+            label: '家电',
+            data: [234, 278, 270, 190, 230]
+          },
+        ]
+      },
     };
   },
   components: {
@@ -191,21 +201,26 @@ export default {
         const date = new Date(now - (6 - index) * 86400000);
         item.name = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
       });
-    }
-    // handleListener() {
-    //     bus.$on('collapse', this.handleBus);
-    //     // 调用renderChart方法对图表进行重新渲染
-    //     window.addEventListener('resize', this.renderChart);
-    // },
-    // handleBus(msg) {
-    //     setTimeout(() => {
-    //         this.renderChart();
-    //     }, 200);
-    // },
-    // renderChart() {
-    //     this.$refs.bar.renderChart();
-    //     this.$refs.line.renderChart();
-    // }
+    },
+    getUserRepoList() {
+
+    },
+    getRepoBaseEntity(val) {
+
+    },
+    getRepoDayEntity(val) {
+
+    },
+    setRepoUserOptions(val) {
+
+    },
+    setRepoCommitOptions(val) {
+
+    },
+    setRepoOpenPROptions(val) {
+
+    },
+
   }
 };
 </script>
