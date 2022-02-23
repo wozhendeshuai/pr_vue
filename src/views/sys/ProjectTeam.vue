@@ -13,7 +13,6 @@
 
     <el-table
         :data="userList"
-
         border
         v-if="userList.length!=0"
         style="width: 100%">
@@ -32,13 +31,17 @@
           label="用户角色">
       </el-table-column>
       <el-table-column
+          prop="userPowerInTeam"
+          label="用户权限">
+      </el-table-column>
+      <el-table-column
           fixed="right"
           label="操作"
       >
         <template slot-scope="scope">
           <el-button @click="handleClick(scope.row)" type="primary" size="small">查看</el-button>
-          <el-button type="warning" size="small">修改成员权限</el-button>
-          <el-button type="danger" size="small">删除</el-button>
+          <el-button @click="isUpdatePower(scope.row)" type="warning" size="small">修改成员权限</el-button>
+          <el-button @click="delMember(scope.row)" type="danger" size="small">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -60,7 +63,40 @@
           </el-select>
         </el-form>
         <el-form>用户权限：
-          <el-checkbox-group v-model="userPowerList">
+          <el-checkbox-group v-model="userPowerList" @change="setPowers">
+            <el-checkbox label="repo">项目数据控制</el-checkbox>
+            <el-checkbox label="team">团队数据控制</el-checkbox>
+            <el-checkbox label="model">优先级模型管理</el-checkbox>
+          </el-checkbox-group>
+        </el-form>
+
+      </el-row>
+      <el-row>
+        <el-form>
+          邮件通知：
+          <el-switch
+              v-model="isMail"
+              active-text="是"
+              inactive-text="否">
+          </el-switch>
+        </el-form>
+      </el-row>
+      <span slot="footer" class="dialog-footer">
+    <el-button type="danger" @click="addNewMember = false">取 消</el-button>
+    <el-button type="primary" @click="setNewMember()">确 定</el-button>
+     </span>
+    </el-dialog>
+    <el-dialog
+        title="修改成员权限"
+        :visible.sync="ischangePower"
+        width="30%"
+        center>
+      <el-row align="center">
+        <el-form :model="newUserName" ref="loginForm" label-width="80px">用户名：
+          {{ updateUserName }}
+        </el-form>
+        <el-form>用户权限：
+          <el-checkbox-group v-model="userPowerList" @change="setPowers">
             <el-checkbox label="repo">项目数据控制</el-checkbox>
             <el-checkbox label="team">团队数据控制</el-checkbox>
             <el-checkbox label="model">优先级模型管理</el-checkbox>
@@ -68,8 +104,8 @@
         </el-form>
       </el-row>
       <span slot="footer" class="dialog-footer">
-    <el-button type="danger" @click="addNewMember = false">取 消</el-button>
-    <el-button type="primary" @click="setNewMember()">确 定</el-button>
+    <el-button type="danger" @click="ischangePower = false">取 消</el-button>
+    <el-button type="primary" @click="updateUserPower()">确 定</el-button>
      </span>
     </el-dialog>
   </div>
@@ -81,6 +117,9 @@ export default {
   name: "Role",
   data() {
     return {
+      updateUserName: '',
+      ischangePower: false,
+      isMail: true,
       addNewMember: false,
       choiceTeamName: '',
       teamList: [],
@@ -117,17 +156,51 @@ export default {
     })
   },
   methods: {
+    updateUserPower(val) {
+      this.ischangePower = false
+      console.log(this.userPowerList)
+      console.log(this.updateUserName)
+      var userPower = this.userPowerList.toString()
+      console.log(this.userPower)
+      this.$axios.get('/project/team/updatemember?teamName=' + this.choiceTeamName
+          + '&userName=' + this.userName
+          + '&updateUserName=' + this.updateUserName
+          + '&newUserPower=' + this.userPowerList.toString()).then(res => {
+        alert(res.data.data)
+        this.getTeamAndUser()
+      })
+    },
+    isUpdatePower(val) {
+      this.ischangePower = true
+      this.updateUserName = val.userName
+      this.userPowerList=val.userPowerInTeam.split(",")
+      console.log(this.userPowerList)
+    },
+    delMember(val) {
+      console.log(val)
+      this.$axios.get('/project/team/delmember?teamName=' + this.choiceTeamName
+          + '&userName=' + this.userName
+          + '&delUserName=' + val.userName).then(res => {
+        alert(res.data.data)
+        this.getTeamAndUser()
+      })
+    },
+    setPowers(val) {
+      this.userPowerList = val;
+      console.log(this.userPowerList)
+    },
     setNewMember() {
       this.addNewMember = false
       console.log(this.userPowerList)
-      var userPower=this.userPowerList.toString()
+      var userPower = this.userPowerList.toString()
       console.log(this.userPower)
       this.$axios.get('/project/team/addmember?teamName=' + this.choiceTeamName + '&userName=' + this.userName
           + '&userRoleInTeam=MEMBER'
           + '&newUserName=' + this.newUserName
-          + '&userPower=' + this.userPowerList.toString()).then(res => {
-        this.noInTeamNameList = res.data.data
-        console.log(this.noInTeamNameList)
+          + '&newUserPower=' + this.userPowerList.toString() + '&isMail=' + this.isMail).then(res => {
+
+        alert(res.data.data)
+        this.getTeamAndUser()
       })
     },
     getNotInTeamNameList() {

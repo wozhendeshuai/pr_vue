@@ -1,243 +1,323 @@
 <template>
   <div>
-    <el-form :inline="true" :data="repoList">
-      <el-form-item>
-        <el-select v-model="choiceRepoName" class="filter-item" placeholder="参与项目列表">
-          <el-option v-for="repo in repoList" :value="repo.repoName">{{ repo.repoName }}</el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-radio-group v-model="choiceEngine" size="small" @change="choiceEngineDone">
-          <el-radio label="alg">优先级排序算法引擎</el-radio>
-          <el-radio label="rule">规则排序引擎</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item>
-        <el-button @click="getPRList()">确认</el-button>
-        <el-button @click="getModelDetail()" v-if="isChoiceModel==true">模型效果查看</el-button>
-      </el-form-item>
-    </el-form>
-    <!--    <el-divider></el-divider>-->
+    <el-row :gutter="20">
+      <el-col :span="8">
+        <el-card shadow="hover" class="mgb20" style="height:403px;">
+          <div class="user-info">
+            <img src="../../assets/devopsLogo.png" class="user-avator" alt />
+            <div class="user-info-cont">
+              <div class="user-info-name">{{name}}</div>
+              <div>{{role}}</div>
+            </div>
+          </div>
+          <div class="user-info-list">
+            上次登录时间：
+            <span>2019-11-01</span>
+          </div>
+          <div class="user-info-list">
+            用户角色列表：
+            <span>东莞</span>
+          </div>
+        </el-card>
 
-    <el-form v-model="isChoiceModel" v-if="isChoiceModel==true">
-      <el-radio-group v-model="choiceModel" size="small" @change="choiceModelDone">
-        <el-radio label="MART">MART</el-radio>
-        <el-radio label="RankNet">RankNet</el-radio>
-        <el-radio label="RankBoost">RankBoost</el-radio>
-        <el-radio label="AdaRank">AdaRank</el-radio>
-        <el-radio label="Coordinate_Ascent">Coordinate Ascent</el-radio>
-        <el-radio label="LambdaMART">LambdaMART</el-radio>
-        <el-radio label="ListNet">ListNet</el-radio>
-        <el-radio label="Random_Forests">Random Forests</el-radio>
-        <el-radio label="bayesnet">bayesnet</el-radio>
-        <el-radio label="xgboost">xgboost</el-radio>
-      </el-radio-group>
-    </el-form>
-    <el-form v-model="isChoiceRule" v-if="isChoiceRule==true">
-      <el-radio-group v-model="choiceRule" size="small" @change="choiceRuleDone">
-        <el-radio label="createtime">时间先后</el-radio>
-        <el-radio label="changefile">修改文件数量</el-radio>
-      </el-radio-group>
-    </el-form>
-
-    <el-table
-        :data="prList"
-        border
-        style="width: 100%">
-      <el-table-column type="expand">
-        <template slot-scope="props">
-          <el-form label-position="left" inline class="pr-table-expand">
-            <el-form-item label="PR标题:">
-              <span>{{ props.row.title }}</span>
-            </el-form-item>
-            <el-form-item label="PR内容:">
-              <span>{{ props.row.body }}</span>
-            </el-form-item>
-            <el-form-item label="PR编号:">
-              <span>{{ props.row.prNumber }}</span>
-            </el-form-item>
-            <el-form-item label="PR创建者:">
-              <span>{{ props.row.prUserName }}</span>
-            </el-form-item>
-            <el-form-item label="PR创建时间:">
-              <span>{{ props.row.createdAt | FormatDate }}</span>
-            </el-form-item>
-            <el-form-item label="PR更新时间:">
-              <span>{{ props.row.updatedAt | FormatDate }}</span>
-            </el-form-item>
-            <el-form-item label="PR提交次数:">
-              <span>{{ props.row.commitNumber }}</span>
-            </el-form-item>
-            <el-form-item label="PR评论数量:">
-              <span>{{ props.row.commentsNumber }}</span>
-            </el-form-item>
-            <el-form-item label="PR评审数量:">
-              <span>{{ props.row.reviewCommentsNumber }}</span>
-            </el-form-item>
-            <el-form-item label="PR增加行数:">
-              <span>{{ props.row.totalAddLine }}</span>
-            </el-form-item>
-            <el-form-item label="PR删除行数:">
-              <span>{{ props.row.totalDeleteLine }}</span>
-            </el-form-item>
-            <el-form-item label="PR与当前分支是否有冲突:">
-              <span>{{ props.row.mergeableState }}</span>
-            </el-form-item>
-          </el-form>
-        </template>
-      </el-table-column>
-      <el-table-column
-          label="PR编号"
-          prop="prNumber">
-      </el-table-column>
-      <el-table-column
-          label="PR标题"
-          prop="title">
-      </el-table-column>
-      <el-table-column
-          label="PR内容"
-          prop="body" :show-overflow-tooltip="true">
-      </el-table-column>
-      <el-table-column label="操作">
-        <template slot-scope="scope">
-          <el-button
-              size="mini"
-              @click="handleDetail(scope.$index, scope.row)">查看PR详情
-          </el-button>
-          <el-button
-              size="mini"
-              type="danger"
-              @click="handleMerge(scope.$index, scope.row)">合入PR
-          </el-button>
-          <el-button
-              size="mini"
-              type="warning"
-              @click="reviewPR(scope.$index, scope.row)">评审PR
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+      </el-col>
+      <el-col :span="16">
+        <el-card shadow="hover" style="height:403px;">
+          <div slot="header" class="clearfix">
+            <span>项目列表</span>
+            <el-button style="float: right; padding: 5px 10px" type="primary">添加项目</el-button>
+          </div>
+          <el-table border :data="todoList" style="width:100%;" height="390">
+            <el-table-column
+                prop="userName"
+                label="项目名称"
+            >
+            </el-table-column>
+            <el-table-column
+                fixed="right"
+                label="操作"
+            >
+              <template slot-scope="scope">
+                <el-button @click="isUpdatePower(scope.row)" type="primary" size="small">查看详情</el-button>
+                <el-button @click="handleClick(scope.row)" type="warning" size="small">手动同步</el-button>
+                <el-button @click="isUpdatePower(scope.row)" type="danger" size="small">定时任务</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-card>
+      </el-col>
+    </el-row>
+    <el-row :gutter="20">
+      <el-col :span="8">
+        <el-card shadow="hover" style="height:252px;">
+          <div slot="header" class="clearfix">
+            <span>语言详情</span>
+          </div>Vue
+          <el-progress :percentage="71.3" color="#42b983"></el-progress>JavaScript
+          <el-progress :percentage="24.1" color="#f1e05a"></el-progress>CSS
+          <el-progress :percentage="13.7"></el-progress>HTML
+          <el-progress :percentage="5.9" color="#f56c6c"></el-progress>
+        </el-card>
+      </el-col>
+      <el-col :span="16">
+        <el-row :gutter="20" class="mgb20">
+          <el-col :span="8">
+            <el-card shadow="hover" :body-style="{padding: '0px'}">
+              <div class="grid-content grid-con-1">
+                <i class="el-icon-lx-people grid-con-icon"></i>
+                <div class="grid-cont-right">
+                  <div class="grid-num">1234</div>
+                  <div>用户数量</div>
+                </div>
+              </div>
+            </el-card>
+          </el-col>
+          <el-col :span="8">
+            <el-card shadow="hover" :body-style="{padding: '0px'}">
+              <div class="grid-content grid-con-2">
+                <i class="el-icon-lx-notice grid-con-icon"></i>
+                <div class="grid-cont-right">
+                  <div class="grid-num">321</div>
+                  <div>提交次数</div>
+                </div>
+              </div>
+            </el-card>
+          </el-col>
+          <el-col :span="8">
+            <el-card shadow="hover" :body-style="{padding: '0px'}">
+              <div class="grid-content grid-con-3">
+                <i class="el-icon-lx-goods grid-con-icon"></i>
+                <div class="grid-cont-right">
+                  <div class="grid-num">5000</div>
+                  <div>开放状态PR</div>
+                </div>
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
+      </el-col>
+    </el-row>
+    <el-row :gutter="20">
+      <el-col :span="12">
+        <el-card shadow="hover">
+          <schart ref="bar" class="schart" canvasId="bar" :options="options"></schart>
+        </el-card>
+      </el-col>
+      <el-col :span="12">
+        <el-card shadow="hover">
+          <schart ref="line" class="schart" canvasId="line" :options="options2"></schart>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script>
+import Schart from 'vue-schart';
+
 export default {
-  name: "Role",
+  name: 'dashboard',
   data() {
     return {
-      repoList: [],
-      isChoiceModel: true,
-      isChoiceRule: false,
-      choiceEngine: "alg",
-      choiceModel: "MART",
-      choiceRule: "createtime",
-      prList: [],
-      choiceRepoName: "",
-      total: 0,
-      size: 10,
-      current: 1,
-      dialogVisible: false,
-      editForm: {},
+      name: localStorage.getItem('ms_username'),
+      todoList: [
+        {
+          title: '今天要修复100个bug',
+          status: false
+        },
 
-      tableData: [],
+      ],
+      data: [
+        {
+          name: '2018/09/04',
+          value: 1083
+        },
 
+      ],
+      options: {
+        type: 'bar',
+        title: {
+          text: '最近一周各品类销售图'
+        },
+        xRorate: 25,
+        labels: ['周一', '周二', '周三', '周四', '周五'],
+        datasets: [
+          {
+            label: '家电',
+            data: [234, 278, 270, 190, 230]
+          },
+
+        ]
+      },
+      options2: {
+        type: 'line',
+        title: {
+          text: '最近几个月各品类销售趋势图'
+        },
+        labels: ['6月', '7月', '8月', '9月', '10月'],
+        datasets: [
+          {
+            label: '家电',
+            data: [234, 278, 270, 190, 230]
+          },
+
+        ]
+      }
+    };
+  },
+  components: {
+    Schart
+  },
+  computed: {
+    role() {
+      return this.name === 'admin' ? '超级管理员' : '普通用户';
     }
   },
-  created() {
-    // this.getUserList()
-
-    this.$axios.get("/project/repo/userProject?userName=" + localStorage.getItem("token")).then(res => {
-      console.log("res.data.data")
-      console.log(res.data.data)
-      this.repoList = res.data.data
-    })
-  },
+  // created() {
+  //     this.handleListener();
+  //     this.changeDate();
+  // },
+  // activated() {
+  //     this.handleListener();
+  // },
+  // deactivated() {
+  //     window.removeEventListener('resize', this.renderChart);
+  //     bus.$off('collapse', this.handleBus);
+  // },
   methods: {
-    reviewPR(index, row) {
-      console.log("选中的在table中的index是："+index);
-      console.log("选中的在table中的prnumber是："+row.prNumber);
-      this.$router.push({path:"/pr/review",query:{repoName: this.choiceRepoName,prNumber: row.prNumber}})
-    },
-    getPRList() {
-      console.log("仓库是" + this.choiceRepoName)
-      console.log("排序引擎是" + this.choiceEngine)
-      console.log("排序算法是" + this.choiceModel)
-      console.log("排序规则是" + this.choiceRule)
-      if (this.isChoiceModel) {
-        this.$axios.get('/prSorting/alg/listOrder?repoName=' + this.choiceRepoName + '&algName=' + this.choiceModel).then(res => {
-          this.prList = res.data.data
-          console.log(this.prList)
-        })
-      } else {
-        this.$axios.get('/prSorting/rule/sortOriginalData?repoName=' + this.choiceRepoName + '&sortRule=' + this.choiceRule).then(res => {
-          this.prList = res.data.data
-          console.log(this.prList)
-        })
-      }
-
-    },
-    handleDetail(index, row) {
-      console.log("选中的在table中的index是："+index);
-      console.log("选中的在table中的prnumber是："+row.prNumber);
-      this.$router.push({path:"/pr/detail",query:{repoName: this.choiceRepoName,prNumber: row.prNumber}})
-    },
-    handleMerge(index, row) {
-      console.log("选中的在table中的index是："+index);
-      console.log("选中的在table中的prnumber是："+row.prNumber);
-    },
-    getModelDetail(){
-      console.log("选中的排序规则是："+this.choiceModel);
-      console.log("仓库是" + this.choiceRepoName)
-      if(this.choiceRepoName.length==0){
-        alert("还未选择项目")
-      }
-      this.$router.push({path:"/pr/model",query:{choiceModel: this.choiceModel,repoName: this.choiceRepoName}})
-    },
-    choiceEngineDone: function (val) {
-      console.log("选择了一个排序引擎")
-      console.log(val)
-      if (val === "alg") {
-        this.isChoiceModel = true
-        this.isChoiceRule = false
-      } else {
-        this.isChoiceModel = false
-        this.isChoiceRule = true
-      }
-    }, choiceModelDone: function (val) {
-      console.log("选择了一个排序算法")
-      console.log(val)
-      this.choiceModel = val
-    },
-    choiceRuleDone: function (val) {
-      console.log("选择了一个排序规则")
-      console.log(val)
-      this.choiceRule = val
-    },
+    changeDate() {
+      const now = new Date().getTime();
+      this.data.forEach((item, index) => {
+        const date = new Date(now - (6 - index) * 86400000);
+        item.name = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
+      });
+    }
+    // handleListener() {
+    //     bus.$on('collapse', this.handleBus);
+    //     // 调用renderChart方法对图表进行重新渲染
+    //     window.addEventListener('resize', this.renderChart);
+    // },
+    // handleBus(msg) {
+    //     setTimeout(() => {
+    //         this.renderChart();
+    //     }, 200);
+    // },
+    // renderChart() {
+    //     this.$refs.bar.renderChart();
+    //     this.$refs.line.renderChart();
+    // }
   }
-}
+};
 </script>
 
+
 <style scoped>
-.demo-table-expand {
-  font-size: 0;
+.el-row {
+  margin-bottom: 20px;
 }
 
-.demo-table-expand label {
-  width: 90px;
-  color: #99a9bf;
+.grid-content {
+  display: flex;
+  align-items: center;
+  height: 100px;
 }
 
-.demo-table-expand .el-form-item {
-  margin-right: 0;
-  margin-bottom: 0;
-  width: 50%;
+.grid-cont-right {
+  flex: 1;
+  text-align: center;
+  font-size: 14px;
+  color: #999;
 }
 
-.el-pagination {
-  float: right;
-  margin-top: 22px;
+.grid-num {
+  font-size: 30px;
+  font-weight: bold;
 }
-label.el-form-item__label {
-  font-weight: bolder;
+
+.grid-con-icon {
+  font-size: 50px;
+  width: 100px;
+  height: 100px;
+  text-align: center;
+  line-height: 100px;
+  color: #fff;
+}
+
+.grid-con-1 .grid-con-icon {
+  background: rgb(45, 140, 240);
+}
+
+.grid-con-1 .grid-num {
+  color: rgb(45, 140, 240);
+}
+
+.grid-con-2 .grid-con-icon {
+  background: rgb(100, 213, 114);
+}
+
+.grid-con-2 .grid-num {
+  color: rgb(45, 140, 240);
+}
+
+.grid-con-3 .grid-con-icon {
+  background: rgb(242, 94, 67);
+}
+
+.grid-con-3 .grid-num {
+  color: rgb(242, 94, 67);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #ccc;
+  margin-bottom: 20px;
+}
+
+.user-avator {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+}
+
+.user-info-cont {
+  padding-left: 50px;
+  flex: 1;
+  font-size: 14px;
+  color: #999;
+}
+
+.user-info-cont div:first-child {
+  font-size: 30px;
+  color: #222;
+}
+
+.user-info-list {
+  font-size: 14px;
+  color: #999;
+  line-height: 25px;
+}
+
+.user-info-list span {
+  margin-left: 70px;
+}
+
+.mgb20 {
+  margin-bottom: 20px;
+}
+
+.todo-item {
+  font-size: 14px;
+}
+
+.todo-item-del {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.schart {
+  width: 100%;
+  height: 300px;
 }
 </style>
