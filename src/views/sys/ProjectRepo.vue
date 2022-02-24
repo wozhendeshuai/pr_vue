@@ -302,6 +302,19 @@ export default {
   methods: {
     addRepo(){
       console.log(this.synDataForm)
+      this.synDataForm.repoName=this.choiceRepoName
+      this.synDataForm.teamName=this.choiceTeamName
+      console.log("传过去的参数是：")
+
+      console.log(this.synDataForm)
+
+      this.$axios.get('/project/repo/reSynRepoData?repoName=' + this.synDataForm.repoName +
+          '&userName=' + this.userName
+          + '&maxPRNum=' + this.synDataForm.maxPRNum)
+          .then(res => {
+            alert(res.data.data)
+          })
+      this.isAddRepo = false
     },
     toAddRepo(){
       this.isAddRepo=true
