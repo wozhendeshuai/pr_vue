@@ -15,9 +15,10 @@
       <el-form-item>
         <el-button @click="getPRList()">确认</el-button>
         <el-button @click="getModelDetail()" v-if="isChoiceModel==true">模型效果查看</el-button>
+        <el-button @click="newPR()" v-if="">新建PR</el-button>
       </el-form-item>
     </el-form>
-<!--    <el-divider></el-divider>-->
+    <!--    <el-divider></el-divider>-->
 
     <el-form v-model="isChoiceModel" v-if="isChoiceModel==true">
       <el-radio-group v-model="choiceModel" size="small" @change="choiceModelDone">
@@ -117,6 +118,17 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-dialog
+        title="新建PR"
+        :visible.sync="newPRVisible"
+        width="60%"
+        center>
+      <span>这里将有定时任务相关信息</span>
+      <span slot="footer" class="dialog-footer">
+    <el-button type="danger" @click="newPRVisible = false">取 消</el-button>
+    <el-button type="primary" @click="newPRVisible = false">确 定</el-button>
+     </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -125,6 +137,7 @@ export default {
   name: "Role",
   data() {
     return {
+      newPRVisible: false,
       repoList: [],
       isChoiceModel: true,
       isChoiceRule: false,
@@ -138,7 +151,7 @@ export default {
       current: 1,
       dialogVisible: false,
       editForm: {},
-
+      userName: '',
       tableData: [],
 
     }
@@ -150,13 +163,22 @@ export default {
       console.log("res.data.data")
       console.log(res.data.data)
       this.repoList = res.data.data
+      this.userName = localStorage.getItem("token")
     })
   },
   methods: {
+    newPR() {
+      this.newPRVisible = true
+      console.log("仓库是" + this.choiceRepoName)
+      this.$axios.get('/project/repo/repoBranch?userName=' + this.userName + '&repoName=' + this.choiceRepoName).then(res => {
+
+        console.log(res.data.data)
+      })
+    },
     reviewPR(index, row) {
-      console.log("选中的在table中的index是："+index);
-      console.log("选中的在table中的prnumber是："+row.prNumber);
-      this.$router.push({path:"/pr/review",query:{repoName: this.choiceRepoName,prNumber: row.prNumber}})
+      console.log("选中的在table中的index是：" + index);
+      console.log("选中的在table中的prnumber是：" + row.prNumber);
+      this.$router.push({path: "/pr/review", query: {repoName: this.choiceRepoName, prNumber: row.prNumber}})
     },
     getPRList() {
       console.log("仓库是" + this.choiceRepoName)
@@ -177,21 +199,21 @@ export default {
 
     },
     handleDetail(index, row) {
-      console.log("选中的在table中的index是："+index);
-      console.log("选中的在table中的prnumber是："+row.prNumber);
-      this.$router.push({path:"/pr/detail",query:{repoName: this.choiceRepoName,prNumber: row.prNumber}})
+      console.log("选中的在table中的index是：" + index);
+      console.log("选中的在table中的prnumber是：" + row.prNumber);
+      this.$router.push({path: "/pr/detail", query: {repoName: this.choiceRepoName, prNumber: row.prNumber}})
     },
     handleMerge(index, row) {
-      console.log("选中的在table中的index是："+index);
-      console.log("选中的在table中的prnumber是："+row.prNumber);
+      console.log("选中的在table中的index是：" + index);
+      console.log("选中的在table中的prnumber是：" + row.prNumber);
     },
-    getModelDetail(){
-      console.log("选中的排序规则是："+this.choiceModel);
+    getModelDetail() {
+      console.log("选中的排序规则是：" + this.choiceModel);
       console.log("仓库是" + this.choiceRepoName)
-      if(this.choiceRepoName.length==0){
+      if (this.choiceRepoName.length == 0) {
         alert("还未选择项目")
       }
-      this.$router.push({path:"/pr/model",query:{choiceModel: this.choiceModel,repoName: this.choiceRepoName}})
+      this.$router.push({path: "/pr/model", query: {choiceModel: this.choiceModel, repoName: this.choiceRepoName}})
     },
     choiceEngineDone: function (val) {
       console.log("选择了一个排序引擎")

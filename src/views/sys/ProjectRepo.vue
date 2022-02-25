@@ -11,12 +11,12 @@
             </div>
           </div>
           <div class="user-info-list">
-            上次登录时间：
-            <span>2019-11-01</span>
+            登录时间：
+            <span>2022-2-25</span>
           </div>
           <div class="user-info-list">
-            用户角色列表：
-            <span>东莞</span>
+            用户操作记录：
+            <span>2022-2-25 手动同步tajo数据</span>
           </div>
         </el-card>
 
@@ -110,7 +110,7 @@
             </el-card>
           </el-col>
           <el-col :span="8">
-            <el-card shadow="hover" :body-style="{padding: '0px'}">
+            <el-card shadow="hover" :body-style="{padding: '0px'}" @click.native="setRepoOpenPROptions()">
               <div class="grid-content grid-con-1">
                 <i class="el-icon-document grid-con-icon"></i>
                 <div class="grid-cont-right">
@@ -147,11 +147,11 @@
         center>
       <el-row align="center">
         <el-form :model="synDataForm" ref="loginForm" label-width="80px">
-          <el-form-item label="项目名称: " prop="repoName" style="width: 390px;" >
+          <el-form-item label="项目名称: " prop="repoName" style="width: 390px;">
             <el-input v-model="synDataForm.repoName"></el-input>
           </el-form-item>
           <el-form-item label="团队名称: " prop="teamName" style="width: 390px;">
-            <el-input  v-model="synDataForm.teamName"></el-input>
+            <el-input v-model="synDataForm.teamName"></el-input>
           </el-form-item>
           <el-form-item label="PR编号：" prop="maxPRNum" style="width: 390px;">
             <el-input v-model="synDataForm.maxPRNum"></el-input>
@@ -300,28 +300,28 @@ export default {
   //     bus.$off('collapse', this.handleBus);
   // },
   methods: {
-    addRepo(){
+    addRepo() {
       console.log(this.synDataForm)
-      this.synDataForm.repoName=this.choiceRepoName
-      this.synDataForm.teamName=this.choiceTeamName
+
       console.log("传过去的参数是：")
 
       console.log(this.synDataForm)
 
-      this.$axios.get('/project/repo/reSynRepoData?repoName=' + this.synDataForm.repoName +
-          '&userName=' + this.userName
+      this.$axios.get('/project/repo/addNewRepo?userName=' + this.userName
+          + '&repoName=' + this.synDataForm.repoName
+          + '&ownerName=' + this.synDataForm.teamName
           + '&maxPRNum=' + this.synDataForm.maxPRNum)
           .then(res => {
             alert(res.data.data)
           })
       this.isAddRepo = false
     },
-    toAddRepo(){
-      this.isAddRepo=true
+    toAddRepo() {
+      this.isAddRepo = true
     },
     trueSynData() {
-      this.synDataForm.repoName=this.choiceRepoName
-      this.synDataForm.teamName=this.choiceTeamName
+      this.synDataForm.repoName = this.choiceRepoName
+      this.synDataForm.teamName = this.choiceTeamName
       console.log("传过去的参数是：")
 
       console.log(this.synDataForm)
@@ -389,6 +389,8 @@ export default {
         tempLabels.push(val[index].dateDay)
         tempData.push(val[index].contributorNum)
       }
+      tempLabels.reverse()
+      tempData.reverse()
       this.repoUserOptions.xAxis.data = tempLabels
       console.log(this.repoUserOptions.xAxis.data)
       this.repoUserOptions.series[0].data = tempData
@@ -399,7 +401,21 @@ export default {
 
     },
     setRepoOpenPROptions(val) {
-
+      var tempLabels = []
+      var tempData = []
+      for (var index = 0; index < this.repoDayEntityList.length; index++) {
+        console.log(this.repoDayEntityList[index])
+        tempLabels.push(this.repoDayEntityList[index].dateDay)
+        tempData.push(this.repoDayEntityList[index].openPrNum)
+      }
+      tempLabels.reverse()
+      tempData.reverse()
+      this.repoUserOptions.xAxis.data = tempLabels
+      console.log(this.repoUserOptions.xAxis.data)
+      this.repoUserOptions.series[0].data = tempData
+      this.repoUserOptions.title.text = "项目开放PR数量变化情况"
+      console.log(this.repoUserOptions.series[0].data)
+      this.drawLineEcharts()
 
     },
     drawLineEcharts() {
