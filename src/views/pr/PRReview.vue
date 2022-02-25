@@ -22,7 +22,7 @@
     </el-form>
     <el-form :inline="true" :data="repoList">
       <el-form-item>
-        <el-select v-model="choiceFileName" filterable class="filter-item" placeholder="项目列表"
+        <el-select v-model="choiceFileName" filterable class="filter-item" placeholder="文件列表"
                    @change="getPRFileDetail()">
           <el-option v-for="fileName in fileNameList" :value="fileName">{{ fileName }}</el-option>
         </el-select>

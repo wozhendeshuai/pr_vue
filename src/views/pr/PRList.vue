@@ -119,14 +119,27 @@
       </el-table-column>
     </el-table>
     <el-dialog
-        title="新建PR"
         :visible.sync="newPRVisible"
         width="60%"
         center>
-      <span>这里将有定时任务相关信息</span>
+      <span slot="title" class="dialog-title" center>
+        {{ choiceRepoName }}新建PR
+      </span>
+      <el-form>
+        <el-form-item label="项目接受改变的分支:">
+          <el-select v-model="baseBranch" filterable class="filter-item" placeholder="项目base分支">
+            <el-option v-for="name in branchsNameList" :value="name">{{ name }}</el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="项目改变的分支:">
+          <el-select v-model="compareBranch" filterable class="filter-item" placeholder="项目compare分支">
+            <el-option v-for="temp in branchs" :value="temp.name">{{ temp.name }}</el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
       <span slot="footer" class="dialog-footer">
     <el-button type="danger" @click="newPRVisible = false">取 消</el-button>
-    <el-button type="primary" @click="newPRVisible = false">确 定</el-button>
+    <el-button type="primary" @click="toNewPR()">确 定</el-button>
      </span>
     </el-dialog>
   </div>
@@ -137,6 +150,7 @@ export default {
   name: "Role",
   data() {
     return {
+
       newPRVisible: false,
       repoList: [],
       isChoiceModel: true,
@@ -153,6 +167,10 @@ export default {
       editForm: {},
       userName: '',
       tableData: [],
+      branchs: [],
+      branchsNameList: [],
+      baseBranch: '',
+      compareBranch: '',
 
     }
   },
@@ -167,12 +185,25 @@ export default {
     })
   },
   methods: {
+    toNewPR() {
+      console.log(this.baseBranch)
+      console.log(this.compareBranch)
+      if (this.baseBranch === this.compareBranch) {
+        alert("不可以选择同一分支")
+      } else {
+        this.newPRVisible = false
+      }
+    },
     newPR() {
       this.newPRVisible = true
       console.log("仓库是" + this.choiceRepoName)
       this.$axios.get('/project/repo/repoBranch?userName=' + this.userName + '&repoName=' + this.choiceRepoName).then(res => {
 
         console.log(res.data.data)
+        this.branchs = res.data.data
+        for (let i = 0; i < this.branchs.length; i++) {
+          this.branchsNameList.push(this.branchs[i].name)
+        }
       })
     },
     reviewPR(index, row) {

@@ -18,6 +18,7 @@
 
       <el-form-item>
         <el-button @click="getPRDetail()">确认</el-button>
+        <el-button @click="toReview()">评审该PR</el-button>
       </el-form-item>
     </el-form>
     <el-divider></el-divider>
@@ -284,7 +285,10 @@ export default {
     })
   },
   methods: {
-
+    toReview() {
+      var tempPrNumber = this.choicePRNumberAndTitle.split(":");
+      this.$router.push({path: "/pr/review", query: {repoName: this.choiceRepoName, prNumber: tempPrNumber[0]}})
+    },
     getPRNumberAndTitle(val) {
       console.log("仓库是" + this.choiceRepoName)
       this.$axios.get('/prManage/prBase/getPRNumberAndTitle?userName=' + this.userName + '&repoName=' + this.choiceRepoName).then(res => {
