@@ -210,7 +210,7 @@ export default {
       console.log(this.newFeatureFile)
       this.$axios.get('/prSorting/alg/reTrainAlg?repoName=' + this.reTrainForm.repoName +
           '&algName=' + this.reTrainForm.algName
-          + '&algPara=' + this.reTrainForm.algParam
+          + '&algParam=' + this.reTrainForm.algParam
           + '&userName=' + this.reTrainForm.userName
           + '&newFeature=' + this.newFeatureFile)
           .then(res => {

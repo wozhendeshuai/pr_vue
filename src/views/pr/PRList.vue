@@ -141,13 +141,25 @@
             <el-option v-for="temp in branchs" :value="temp.name">{{ temp.name }}</el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="PR标题" prop="name">
+        <el-form-item label="PR标题：" prop="name">
           <el-input v-model="newPRTitle"></el-input>
         </el-form-item>
-        <el-form-item label="PR内容" prop="desc">
+        <el-form-item label="PR内容：" prop="desc">
           <el-input type="textarea" v-model="newPRBody"></el-input>
         </el-form-item>
+        <el-form-item label="是否通知团队成员：" prop="desc">
+          <el-radio-group v-model="isNotify">
+            <el-radio :label="1">是</el-radio>
+            <el-radio :label="0">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="通知团队成员:" v-if="isNotify===1">
+          <el-select v-model="notifyMemberName" filterable class="filter-item" placeholder="项目成员列表">
+            <el-option v-for="members in teamMembers" :value="members.userName">{{ members.userName }}</el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
+
       <span slot="footer" class="dialog-footer">
     <el-button type="danger" @click="newPRVisible = false">取 消</el-button>
     <el-button type="primary" @click="toNewPR()">确 定</el-button>
@@ -176,11 +188,11 @@
             <el-radio label="squash">将发生改变的分支中多个commit合并为一个commit</el-radio>
             <el-radio label="rebase">将发生改变的分支中的每一次提交都rebase到原仓库</el-radio>
           </el-radio-group>
-<!--          <el-radio-group v-model="mergeMethod">-->
-<!--            <el-radio-button label="merge">合入发生改变的分支中每次提交</el-radio-button>-->
-<!--            <el-radio-button label="squash">将发生改变的分支中多个commit合并为一个commit</el-radio-button>-->
-<!--            <el-radio-button label="rebase">将发生改变的分支中的每一次提交都rebase到原仓库</el-radio-button>-->
-<!--          </el-radio-group>-->
+          <!--          <el-radio-group v-model="mergeMethod">-->
+          <!--            <el-radio-button label="merge">合入发生改变的分支中每次提交</el-radio-button>-->
+          <!--            <el-radio-button label="squash">将发生改变的分支中多个commit合并为一个commit</el-radio-button>-->
+          <!--            <el-radio-button label="rebase">将发生改变的分支中的每一次提交都rebase到原仓库</el-radio-button>-->
+          <!--          </el-radio-group>-->
         </el-form-item>
 
       </el-form>
@@ -202,6 +214,10 @@ export default {
       mergeTitle: '',
       mergeMessage: '',
       mergeMethod: 'merge',
+      teamMembers: [],
+      choiceTeamName: '',
+      notifyMemberName: '',
+      isNotify: 0,
 
       newPRTitle: '',
       newPRBody: '',
@@ -240,6 +256,15 @@ export default {
     })
   },
   methods: {
+    getTeamAndUser() {
+      console.log("选择的团队名称是" + this.choiceTeamName)
+      this.$axios.get('/project/team/listTeamAndMemberUser?teamName=' + this.choiceTeamName + '&userName=' + this.userName).then(res => {
+        this.teamEntity = res.data.data
+        console.log(this.teamEntity)
+        this.teamMembers = this.teamEntity.userBaseEntityList
+        console.log(this.teamMembers)
+      })
+    },
     toMergePR() {
       console.log(this.choiceRepoName)
       console.log(this.mergeTitle)
@@ -264,7 +289,7 @@ export default {
           + '&commitTitle=' + this.mergeTitle
           + '&commitMessage=' + this.mergeMessage
           + '&mergeMethod=' + this.mergeMethod
-         ).then(res => {
+      ).then(res => {
         console.log(res.data.data)
         alert(res.data.data)
       })
@@ -284,7 +309,7 @@ export default {
       console.log(this.newPRTitle)
       console.log(this.newPRBody)
       console.log(this.choiceRepoName)
-
+      console.log("this.notifyMemberName: " + this.notifyMemberName)
       for (let i = 0; i < this.repoList.length; i++) {
         if (this.repoList[i].repoName === this.choiceRepoName) {
           this.choiceFullName = this.repoList[i].teamName
@@ -304,7 +329,8 @@ export default {
             + '&baseBranch=' + this.baseBranch
             + '&compareBranch=' + this.compareBranch
             + '&prTitle=' + this.newPRTitle
-            + '&prContent=' + this.newPRBody).then(res => {
+            + '&prContent=' + this.newPRBody
+            + '&notifyUserName' + this.notifyMemberName).then(res => {
           console.log(res.data.data)
           alert(res.data.data)
         })
@@ -347,6 +373,17 @@ export default {
         for (let i = 0; i < this.branchs.length; i++) {
           this.branchsNameList.push(this.branchs[i].name)
         }
+        for (let i = 0; i < this.repoList.length; i++) {
+          if (this.repoList[i].repoName === this.choiceRepoName) {
+            this.choiceFullName = this.repoList[i].teamName
+            break
+          }
+        }
+        console.log(this.choiceFullName)
+        var teamNameArr = this.choiceFullName.split("/")
+        this.choiceTeamName = teamNameArr[0]
+        console.log(this.choiceTeamName)
+        this.getTeamAndUser()
       })
     },
     reviewPR(index, row) {

@@ -46,7 +46,7 @@
               <template slot-scope="scope">
                 <el-button @click="getRepoDate(scope.row)" type="primary" size="small">查看详情</el-button>
                 <el-button @click="handleSynData(scope.row)" type="warning" size="small">手动同步</el-button>
-                <el-button @click="isUpdatePower(scope.row)" type="danger" size="small">定时任务</el-button>
+                <el-button @click="isUpdateTimeTask(scope.row)" type="danger" size="small">定时任务</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -185,6 +185,29 @@
       <el-button type="primary" @click="trueSynData()">确 定</el-button>
 
     </el-dialog>
+
+    <el-dialog
+        title="定时任务"
+        :visible.sync="isTimeTask"
+        width="60%"
+        center>
+      <el-row align="center">
+        <el-form :model="prTask" ref="loginForm" label-width="80px">
+          <el-form-item label="项目名称: " prop="repoName" style="width: 390px;" v-model="prTask.repoName">
+            {{ prTask.repoName }}
+          </el-form-item>
+          <el-form-item label="团队名称: " prop="teamName" style="width: 390px;" v-model="prTask.teamName">
+            {{ prTask.teamName }}
+          </el-form-item>
+          <el-form-item label="Cron表达式：" prop="cronExpression" style="width: 390px;">
+            <el-input v-model="prTask.cronExpression"></el-input>
+          </el-form-item>
+        </el-form>
+      </el-row>
+      <el-button type="danger" @click="isTimeTask = false">取 消</el-button>
+      <el-button type="primary" @click="trueSynData()">确 定</el-button>
+
+    </el-dialog>
   </div>
 </template>
 
@@ -196,7 +219,35 @@ export default {
   name: 'dashboard',
   data() {
     return {
+      isTimeTask: false,
       isAddRepo: false,
+      prTask: {
+        id: "",
+        type: "",
+        jobName: "",
+        jobGroup: "",
+        repoName: "",
+        teamName: "",
+        algName: null,
+        algParam: null,
+        description: null,
+        jobUser: "",
+        jobClassName: "com.jjyu.job.ProjectDataCollectionJob",
+        cronExpression: "",
+        triggerTime: "",
+        triggerState: null,
+        orderBy: null,
+        remark: null,
+        createTime: "",
+        createUser: "",
+        createOrganize: "",
+        updateUser: null,
+        updateTime: null,
+        authOrganizeIds: null,
+        authUser: null,
+        oldJobName: null,
+        oldJobGroup: null,
+      },
       synDataForm: {
         repoName: '',
         teamName: '',
@@ -300,6 +351,18 @@ export default {
   //     bus.$off('collapse', this.handleBus);
   // },
   methods: {
+    isUpdateTimeTask(val) {
+      console.log(val)
+      this.isTimeTask = true
+
+      this.choiceRepoName = val.repoName
+      this.choiceTeamName = val.teamName
+      this.$axios.get('/prTask/getPRTask?repoName=' + val.repoName +
+          '&taskType=repo').then(res => {
+        console.log(res.data.data)
+        this.prTask = res.data.data
+      })
+    },
     addRepo() {
       console.log(this.synDataForm)
 
@@ -338,7 +401,6 @@ export default {
       this.isSynData = true
       this.choiceRepoName = val.repoName
       this.choiceTeamName = val.teamName
-
     },
     getRepoDate(val) {
       console.log(val)
