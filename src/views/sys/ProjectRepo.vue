@@ -165,24 +165,26 @@
     <el-dialog
         title="手动同步项目数据"
         :visible.sync="isSynData"
-        width="60%"
+        width="20%"
         center>
       <el-row align="center">
-        <el-form :model="synDataForm" ref="loginForm" label-width="80px">
+        <el-form :model="synDataForm" ref="loginForm" label-width="100px" label-position='left'>
           <el-form-item label="项目名称: " prop="repoName" style="width: 390px;" v-model="synDataForm.repoName">
             {{ choiceRepoName }}
           </el-form-item>
           <el-form-item label="团队名称: " prop="teamName" style="width: 390px;" v-model="synDataForm.teamName">
             {{ choiceTeamName }}
           </el-form-item>
-          <el-form-item label="PR编号：" prop="maxPRNum" style="width: 390px;">
+          <el-form-item label="最大PR编号：" prop="maxPRNum" style="width: 420px;">
             <el-input v-model="synDataForm.maxPRNum"></el-input>
           </el-form-item>
 
         </el-form>
       </el-row>
+      <span slot="footer" class="dialog-footer">
       <el-button type="danger" @click="isSynData = false">取 消</el-button>
       <el-button type="primary" @click="trueSynData()">确 定</el-button>
+      </span>
 
     </el-dialog>
 
