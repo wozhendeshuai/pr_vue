@@ -8,10 +8,11 @@ import "element-ui/lib/theme-chalk/index.css"
 
 import axios from './axios'
 import global from './globalFun'
-
+import VueCron from 'vue-cron'
+Vue.use(VueCron);
 Vue.prototype.$axios = axios //
 Vue.config.productionTip = false
-
+import './utils/directives.js'
 // require("./mock.js")
 
 Vue.use(Element)

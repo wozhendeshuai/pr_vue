@@ -28,9 +28,10 @@
     <div id="chart"></div>
     <el-row :gutter="20">
       <el-button type="primary" @click="reTrainVisible = true">重新训练{{ choiceModel }}</el-button>
-      <el-button @click="timetaskVisible = true">设置{{ choiceModel }}定时任务</el-button>
+      <el-button @click="isUpdateTimeTask()">设置{{ choiceModel }}定时任务</el-button>
     </el-row>
     <el-dialog
+        v-dialogDrag
         title="重新训练"
         :visible.sync="reTrainVisible"
         width="30%"
@@ -58,15 +59,42 @@
      </span>
     </el-dialog>
     <el-dialog
-        title="定时任务设置"
+        v-dialogDrag
+        title="定时任务"
         :visible.sync="timetaskVisible"
         width="30%"
         center>
-      <span>这里将有定时任务相关信息</span>
+      <el-row align="center">
+        <el-form :model="prTask" ref="loginForm" label-width="80px"  label-position='left'>
+          <el-form-item label="项目名称: " prop="repoName" style="width: 390px;" v-model="prTask.repoName">
+            {{ prTask.repoName }}
+          </el-form-item>
+          <el-form-item label="团队名称: " prop="teamName" style="width: 390px;" v-model="prTask.teamName">
+            {{ prTask.teamName }}
+          </el-form-item>
+          <el-form-item label="触发周期: " prop="cronExpression" style="width: 390px;">
+            <el-popover v-model="cronPopover">
+              <VueCron @change="onChangeCron" @close="cronPopover = false"></VueCron>
+              <el-input
+                  slot="reference"
+                  @click="cronPopover = true"
+                  v-model="prTask.cronExpression"
+                  placeholder="请输入定时策略"
+                  size="small"
+              ></el-input>
+            </el-popover>
+          </el-form-item>
+          <el-form-item label="算法参数: " prop="cronExpression" style="width: 390px;">
+            <el-input  type="textarea"
+                       :rows="2"
+                       v-model="prTask.algParam"></el-input>
+          </el-form-item>
+        </el-form>
+      </el-row>
       <span slot="footer" class="dialog-footer">
-    <el-button type="danger" @click="timetaskVisible = false">取 消</el-button>
-    <el-button type="primary" @click="timetaskVisible = false">确 定</el-button>
-     </span>
+      <el-button type="danger" @click="timetaskVisible = false">取 消</el-button>
+      <el-button type="primary" @click="timetaskVisible = false">确 定</el-button>
+      </span>
     </el-dialog>
   </div>
 
@@ -74,6 +102,7 @@
 
 <script>
 import * as echarts from 'echarts';
+import VueCron from 'vue-cron';
 
 export default {
 
@@ -81,6 +110,35 @@ export default {
   data() {
 
     return {
+      cronPopover: false,
+      isTimeTask: false,
+      prTask: {
+        id: "",
+        type: "",
+        jobName: "",
+        jobGroup: "",
+        repoName: "",
+        teamName: "",
+        algName: null,
+        algParam: null,
+        description: null,
+        jobUser: "",
+        jobClassName: "com.jjyu.job.ProjectDataCollectionJob",
+        cronExpression: "",
+        triggerTime: "",
+        triggerState: null,
+        orderBy: null,
+        remark: null,
+        createTime: "",
+        createUser: "",
+        createOrganize: "",
+        updateUser: null,
+        updateTime: null,
+        authOrganizeIds: null,
+        authUser: null,
+        oldJobName: null,
+        oldJobGroup: null,
+      },
       reTrainForm: {
         repoName: '',
         algName: '',
@@ -175,6 +233,10 @@ export default {
       newFeatureFile: 'false',
     }
   },
+  components: {
+
+    VueCron,
+  },
   created() {
     // this.getUserList()
 
@@ -201,6 +263,18 @@ export default {
 
   },
   methods: {
+    onChangeCron(v) {
+      this.prTask.cronExpression = v
+    },
+    isUpdateTimeTask(val) {
+      console.log(val)
+      this.timetaskVisible = true
+      this.$axios.get('/prTask/getPRTask?repoName=' + this.choiceRepoName +
+          '&taskType=alg'+this.choiceModel).then(res => {
+        console.log(res.data.data)
+        this.prTask = res.data.data
+      })
+    },
     reTrainModel() {
       console.log("传过去的参数是：")
       this.reTrainForm.algName = this.choiceModel

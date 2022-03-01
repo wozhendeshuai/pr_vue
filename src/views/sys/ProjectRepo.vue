@@ -141,9 +141,10 @@
       </el-card>
     </el-row>
     <el-dialog
+        v-dialogDrag
         title="添加项目"
         :visible.sync="isAddRepo"
-        width="60%"
+        width="30%"
         center>
       <el-row align="center">
         <el-form :model="synDataForm" ref="loginForm" label-width="80px">
@@ -163,9 +164,10 @@
 
     </el-dialog>
     <el-dialog
+        v-dialogDrag
         title="手动同步项目数据"
         :visible.sync="isSynData"
-        width="20%"
+        width="30%"
         center>
       <el-row align="center">
         <el-form :model="synDataForm" ref="loginForm" label-width="100px" label-position='left'>
@@ -189,38 +191,56 @@
     </el-dialog>
 
     <el-dialog
+        v-dialogDrag
         title="定时任务"
         :visible.sync="isTimeTask"
-        width="60%"
+        width="30%"
         center>
       <el-row align="center">
-        <el-form :model="prTask" ref="loginForm" label-width="80px">
+        <el-form :model="prTask" ref="loginForm" label-width="80px"  label-position='left'>
           <el-form-item label="项目名称: " prop="repoName" style="width: 390px;" v-model="prTask.repoName">
             {{ prTask.repoName }}
           </el-form-item>
           <el-form-item label="团队名称: " prop="teamName" style="width: 390px;" v-model="prTask.teamName">
             {{ prTask.teamName }}
           </el-form-item>
-          <el-form-item label="Cron表达式：" prop="cronExpression" style="width: 390px;">
-            <el-input v-model="prTask.cronExpression"></el-input>
+          <el-form-item label="触发周期: " prop="cronExpression" style="width: 390px;">
+            <el-popover v-model="cronPopover">
+              <VueCron @change="onChangeCron" @close="cronPopover = false"></VueCron>
+                <el-input
+                    slot="reference"
+                    @click="cronPopover = true"
+                    v-model="prTask.cronExpression"
+                    placeholder="请输入定时策略"
+                    size="small"
+                ></el-input>
+            </el-popover>
           </el-form-item>
+<!--          <el-form-item label="触发周期: " prop="cronExpression" style="width: 390px;">-->
+<!--            <el-input v-model="prTask.cronExpression"></el-input>-->
+<!--          </el-form-item>-->
         </el-form>
       </el-row>
+      <span slot="footer" class="dialog-footer">
       <el-button type="danger" @click="isTimeTask = false">取 消</el-button>
-      <el-button type="primary" @click="trueSynData()">确 定</el-button>
-
+      <el-button type="primary" @click="isTimeTask = false">确 定</el-button>
+      </span>
     </el-dialog>
+
   </div>
 </template>
 
 <script>
 import Schart from 'vue-schart';
 import * as echarts from "echarts";
+import VueCron from 'vue-cron';
+
 
 export default {
   name: 'dashboard',
   data() {
     return {
+      cronPopover: false,
       isTimeTask: false,
       isAddRepo: false,
       prTask: {
@@ -323,8 +343,10 @@ export default {
       },
     };
   },
+
   components: {
-    Schart
+    Schart,
+    VueCron,
   },
 
   created() {
@@ -341,18 +363,11 @@ export default {
     this.drawEcharts();
 
   },
-  // created() {
-  //     this.handleListener();
-  //     this.changeDate();
-  // },
-  // activated() {
-  //     this.handleListener();
-  // },
-  // deactivated() {
-  //     window.removeEventListener('resize', this.renderChart);
-  //     bus.$off('collapse', this.handleBus);
-  // },
+
   methods: {
+    onChangeCron(v) {
+      this.prTask.cronExpression = v
+    },
     isUpdateTimeTask(val) {
       console.log(val)
       this.isTimeTask = true
@@ -615,6 +630,10 @@ export default {
 }
 
 .schart {
+  width: 100%;
+  height: 300px;
+}
+.VueCron {
   width: 100%;
   height: 300px;
 }
