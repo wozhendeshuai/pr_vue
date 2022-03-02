@@ -192,7 +192,7 @@
 
     <el-dialog
         v-dialogDrag
-        title="定时任务"
+        title="项目数据同步定时任务"
         :visible.sync="isTimeTask"
         width="30%"
         center>

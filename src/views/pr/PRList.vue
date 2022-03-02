@@ -38,6 +38,10 @@
       <el-radio-group v-model="choiceRule" size="small" @change="choiceRuleDone">
         <el-radio label="createtime">时间先后</el-radio>
         <el-radio label="changefile">修改文件数量</el-radio>
+        <el-radio label="changefile">修改行数</el-radio>
+        <el-radio label="changefile">创建者创建PR数</el-radio>
+        <el-radio label="changefile">创建者合入概率</el-radio>
+        <el-radio label="changefile">创建者拒绝概率</el-radio>
       </el-radio-group>
     </el-form>
 
@@ -448,24 +452,23 @@ export default {
 </script>
 
 <style scoped>
-.demo-table-expand {
+.pr-table-expand {
   font-size: 0;
 }
-
-.demo-table-expand label {
+.pr-table-expand label {
   width: 90px;
-  color: #99a9bf;
+  color: #000000;
+  font-weight: bold;
 }
-
-.demo-table-expand .el-form-item {
+.pr-table-expand .el-form-item {
   margin-right: 0;
   margin-bottom: 0;
   width: 50%;
 }
 
-.el-pagination {
-  float: right;
-  margin-top: 22px;
-}
+/*.el-pagination {*/
+/*  float: right;*/
+/*  margin-top: 22px;*/
+/*}*/
 
 </style>

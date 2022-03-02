@@ -34,10 +34,10 @@
         v-dialogDrag
         title="重新训练"
         :visible.sync="reTrainVisible"
-        width="30%"
+        width="40%"
         center>
       <el-row align="center">
-        <el-form :model="reTrainForm" ref="loginForm" label-width="80px">
+        <el-form :model="reTrainForm" ref="loginForm" label-width="80px"  label-position='left'>
           <el-form-item label="项目名称" prop="repoName" style="width: 390px;" v-model="reTrainForm.repoName">
             {{ choiceRepoName }}
           </el-form-item>
@@ -47,10 +47,12 @@
           <el-form-item label="算法参数" prop="algParam" style="width: 390px;">
             <el-input v-model="reTrainForm.algParam"></el-input>
           </el-form-item>
+          <el-form-item label="新建特征文件"  style="width: 390px;">
           <el-radio-group v-model="newFeatureFile" size="small">
             <el-radio label="true">是</el-radio>
             <el-radio label="false">否</el-radio>
           </el-radio-group>
+          </el-form-item>
         </el-form>
       </el-row>
       <span slot="footer" class="dialog-footer">
@@ -60,7 +62,7 @@
     </el-dialog>
     <el-dialog
         v-dialogDrag
-        title="定时任务"
+        title="模型训练定时任务"
         :visible.sync="timetaskVisible"
         width="30%"
         center>
