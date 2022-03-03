@@ -23,13 +23,14 @@
     </el-form>
     <el-divider></el-divider>
     <el-form>
-      PR编号与标题：
+      <h3>PR编号与标题：</h3>
       <el-card>
-        <div> {{ prDetail.prNumber }} {{ prDetail.title }}</div>
-        <div>{{ prDetail.prNumber }} PR的状态为：{{ prDetail.state }}</div>
+        <div> {{ prDetail.prNumber }}号PR标题： {{ prDetail.title }}</div>
+        <div>{{ prDetail.prNumber }}号PR的状态为：{{ prDetail.state }}</div>
       </el-card>
       <el-divider></el-divider>
-      <div>内容
+      <div>
+        <h3>内容</h3>
         <el-card>
           <span></span>{{ prDetail.body }}
         </el-card>
@@ -40,15 +41,16 @@
       </div>
       <div v-if="prDetail.prNumber!=null">
         <el-link v-bind:href="['https://github.com/tensorflow/tensorflow/pull/'+prDetail.prNumber]" target="_blank">
-          GitHub中第 {{ prDetail.prNumber }}号 PR 详情页面
+         <h3> GitHub中第 {{ prDetail.prNumber }}号 PR 评论详情页面</h3>
         </el-link>
       </div>
       <div class="radio" v-if="comments.length!=0">
-        排序：
+        <h4>排序：
         <el-radio-group v-model="reverse">
           <el-radio :label="true">倒序</el-radio>
           <el-radio :label="false">正序</el-radio>
         </el-radio-group>
+        </h4>
       </div>
 
       <el-timeline :reverse="reverse">
@@ -65,7 +67,8 @@
         </el-timeline-item>
       </el-timeline>
     </el-form>
-    <el-divider></el-divider>
+<!--    <el-divider></el-divider>-->
+    <h3>发表评论：</h3>
     <!--   <comment></comment>-->
     <div class="hbl-fa">
 

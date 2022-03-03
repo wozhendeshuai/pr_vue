@@ -30,12 +30,13 @@
     </el-form>
     <el-divider></el-divider>
     <el-form>
-      PR编号与标题：
+
+      <h3>PR编号与标题：</h3>
       <el-card>
         <div> {{ choicePRNumberAndTitle }}</div>
       </el-card>
       <el-divider></el-divider>
-      <div>修改的文件内容：
+      <div><h3>修改的{{choiceFileName}}文件内容：</h3>
         <el-card>
           <span></span>
           <el-col style="white-space: pre-wrap;">{{ fileDetail.patchContent }}</el-col>
@@ -44,6 +45,7 @@
       <el-divider></el-divider>
     </el-form>
     <el-divider></el-divider>
+    <h3>发表评审意见：</h3>
     <!--   <comment></comment>-->
     <div class="hbl-fa">
 
