@@ -119,11 +119,21 @@
               type="warning"
               @click="reviewPR(scope.$index, scope.row)">评审PR
           </el-button>
-          <el-button
-              size="mini"
-              type="danger"
-              @click="closePR(scope.$index, scope.row)">关闭PR
-          </el-button>
+          <el-popconfirm
+              confirm-button-text='好的'
+              cancel-button-text='不用了'
+              icon="el-icon-info"
+              icon-color="red"
+              title="确定关闭该PR嘛？"
+              @confirm="closePR(scope.$index, scope.row)"
+          >
+            <el-button
+                size="mini"
+                type="danger"
+                slot="reference"
+                >关闭PR
+            </el-button>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -189,7 +199,7 @@
         <el-form-item label="merge方式:">
           <el-radio-group v-model="mergeMethod">
             <el-radio label='merge'>合入发生改变的分支中每次提交</el-radio>
-            <el-radio label="squash">将发生改变的分支中多个commit合并为一个commit</el-radio>
+            <el-radio label="squash">将发生改变的分支中多个提交记录合并为一个提交</el-radio>
             <el-radio label="rebase">将发生改变的分支中的每一次提交都rebase到原仓库</el-radio>
           </el-radio-group>
           <!--          <el-radio-group v-model="mergeMethod">-->
@@ -455,11 +465,13 @@ export default {
 .pr-table-expand {
   font-size: 0;
 }
+
 .pr-table-expand label {
   width: 90px;
   color: #000000;
   font-weight: bold;
 }
+
 .pr-table-expand .el-form-item {
   margin-right: 0;
   margin-bottom: 0;
