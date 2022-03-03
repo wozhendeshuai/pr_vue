@@ -105,41 +105,53 @@
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button
-              size="mini"
-              @click="handleDetail(scope.$index, scope.row)">查看PR详情
-          </el-button>
-          <el-button
-              size="mini"
-              type="primary"
-              @click="handleMerge(scope.$index, scope.row)">合入PR
-          </el-button>
-          <el-button
-              size="mini"
-              type="warning"
-              @click="reviewPR(scope.$index, scope.row)">评审PR
-          </el-button>
-          <el-popconfirm
-              confirm-button-text='好的'
-              cancel-button-text='不用了'
-              icon="el-icon-info"
-              icon-color="red"
-              title="确定关闭该PR嘛？"
-              @confirm="closePR(scope.$index, scope.row)"
-          >
-            <el-button
-                size="mini"
-                type="danger"
-                slot="reference"
+          <el-row :gutter="20">
+            <el-col :span="5">
+              <el-button
+                  size="mini"
+                  @click="handleDetail(scope.$index, scope.row)">查看PR详情
+              </el-button>
+            </el-col>
+            <el-col :span="5">
+              <el-button
+                  size="mini"
+                  type="primary"
+                  @click="handleMerge(scope.$index, scope.row)">合入PR
+              </el-button>
+            </el-col>
+            <el-col :span="5">
+              <el-button
+                  size="mini"
+                  type="warning"
+                  @click="reviewPR(scope.$index, scope.row)">评审PR
+              </el-button>
+            </el-col>
+            <el-col :span="5">
+              <el-popconfirm
+                  confirm-button-text='好的'
+                  cancel-button-text='不用了'
+                  icon="el-icon-info"
+                  icon-color="red"
+                  title="确定关闭该PR嘛？"
+                  @confirm="closePR(scope.$index, scope.row)"
+              >
+                <el-button
+                    size="mini"
+                    type="danger"
+                    slot="reference"
                 >关闭PR
-            </el-button>
-          </el-popconfirm>
+                </el-button>
+              </el-popconfirm>
+            </el-col>
+          </el-row>
+
         </template>
       </el-table-column>
     </el-table>
     <el-dialog
+        v-dialogDrag
         :visible.sync="newPRVisible"
-        width="60%"
+        width="40%"
         center>
       <span slot="title" class="dialog-title" center>
         {{ choiceRepoName }}新建PR
@@ -180,8 +192,9 @@
      </span>
     </el-dialog>
     <el-dialog
+        v-dialogDrag
         :visible.sync="isMerge"
-        width="60%"
+        width="25%"
         center>
       <span slot="title" class="dialog-title" center>
         项目{{ choiceRepoName }} 合并{{ choicePRDetail.prNumber }}号PR
