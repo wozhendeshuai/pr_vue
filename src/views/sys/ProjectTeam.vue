@@ -38,20 +38,41 @@
           fixed="right"
           label="操作"
       >
-        <template slot-scope="scope">
-          <el-button @click="handleClick(scope.row)" type="primary" size="small">查看</el-button>
-          <el-button @click="isUpdatePower(scope.row)" type="warning" size="small">修改成员权限</el-button>
-          <el-button @click="delMember(scope.row)" type="danger" size="small">删除</el-button>
-        </template>
+
+          <template slot-scope="scope">
+            <el-row :gutter="12">
+            <el-col :span="3">
+              <el-button @click="handleClick(scope.row)" type="primary" size="small">查看</el-button>
+            </el-col>
+            <el-col :span="6">
+              <el-button @click="isUpdatePower(scope.row)" type="warning" size="small">修改成员权限</el-button>
+            </el-col>
+            <el-col :span="3">
+              <el-popconfirm
+                  confirm-button-text='好的'
+                  cancel-button-text='不用了'
+                  icon="el-icon-info"
+                  icon-color="red"
+                  title="确定从团队成员中删除该用户？"
+                  @confirm="delMember(scope.row)"
+              >
+                <el-button type="danger" size="small" slot="reference">删除</el-button>
+              </el-popconfirm>
+            </el-col>
+            </el-row>
+          </template>
+
       </el-table-column>
+
     </el-table>
     <el-form>
       <el-button @click="getNotInTeamNameList()" type="primary" size="small">为团队新增成员</el-button>
     </el-form>
     <el-dialog
+        v-dialogDrag
         title="新增团队成员"
         :visible.sync="addNewMember"
-        width="30%"
+        width="20%"
         center>
       <el-row align="center">
         <el-form :model="newUserName" ref="loginForm" label-width="80px">选择用户名：
@@ -87,9 +108,10 @@
      </span>
     </el-dialog>
     <el-dialog
+        v-dialogDrag
         title="修改成员权限"
         :visible.sync="ischangePower"
-        width="30%"
+        width="20%"
         center>
       <el-row align="center">
         <el-form :model="newUserName" ref="loginForm" label-width="80px">用户名：
@@ -173,7 +195,7 @@ export default {
     isUpdatePower(val) {
       this.ischangePower = true
       this.updateUserName = val.userName
-      this.userPowerList=val.userPowerInTeam.split(",")
+      this.userPowerList = val.userPowerInTeam.split(",")
       console.log(this.userPowerList)
     },
     delMember(val) {

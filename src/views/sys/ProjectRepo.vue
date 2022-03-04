@@ -25,7 +25,7 @@
         <el-card shadow="hover" style="height:403px;">
           <div slot="header" class="clearfix">
             <span>项目列表</span>
-            <el-button @click="toAddRepo()" style="float: right; padding: 5px 10px" type="primary">添加项目</el-button>
+            <el-button @click="toAddRepo()" style="float: right; padding: 5px 10px" type="primary">导入项目</el-button>
           </div>
           <el-table border :data="userRepoList" style="width:100%;" height="390">
             <el-table-column
@@ -142,9 +142,9 @@
     </el-row>
     <el-dialog
         v-dialogDrag
-        title="添加项目"
+        title="导入项目"
         :visible.sync="isAddRepo"
-        width="30%"
+        width="20%"
         center>
       <el-row align="center">
         <el-form :model="synDataForm" ref="loginForm" label-width="80px">
@@ -159,9 +159,10 @@
           </el-form-item>
         </el-form>
       </el-row>
+      <span slot="footer" class="dialog-footer">
       <el-button type="danger" @click="isAddRepo = false">取 消</el-button>
       <el-button type="primary" @click="addRepo()">确 定</el-button>
-
+      </span>
     </el-dialog>
     <el-dialog
         v-dialogDrag
